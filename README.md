@@ -12,3 +12,6 @@ Backend para la app Sign.ia, que traduce Lenguaje de Señas Mexicano (LSM) a voz
 2. Instala dependencias: `npm install`
 3. Configura la variable de entorno `MONGO_URI` en un archivo `.env`.
 4. Inicia el servidor: `npm start`
+
+## Notas
+- Este proyecto usa MongoDB Atlas para la base de datos.

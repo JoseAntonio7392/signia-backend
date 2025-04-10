@@ -11,35 +11,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Clona el repositorio
     - uses: actions/checkout@v3
-
-    # Configura Node.js
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '18'
-
-    # Instala dependencias
     - name: Install dependencies
       run: npm install
-
-    # Configura variables de entorno
     - name: Set up environment variables
       run: |
         echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> .env
         echo "PORT=3000" >> .env
-
-    # Muestra el contenido del .env para depuración
     - name: Debug environment variables
       run: cat .env
-
-    # Corre el servidor en segundo plano
     - name: Start server
       run: npm start &
-
-    # Prueba el endpoint con más tiempo de espera
     - name: Test API
       run: |
-        sleep 10 # Aumentamos el tiempo de espera
+        sleep 10
         curl http://localhost:3000/api || echo "Failed to connect to API"
