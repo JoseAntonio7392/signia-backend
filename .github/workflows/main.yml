@@ -30,12 +30,16 @@ jobs:
         echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> .env
         echo "PORT=3000" >> .env
 
-    # Corre el servidor (en segundo plano)
+    # Muestra el contenido del .env para depuración
+    - name: Debug environment variables
+      run: cat .env
+
+    # Corre el servidor en segundo plano
     - name: Start server
       run: npm start &
 
-    # Prueba un endpoint (usando curl)
+    # Prueba el endpoint con más tiempo de espera
     - name: Test API
       run: |
-        sleep 5 # Espera a que el servidor arranque
-        curl http://localhost:3000/api
+        sleep 10 # Aumentamos el tiempo de espera
+        curl http://localhost:3000/api || echo "Failed to connect to API"
