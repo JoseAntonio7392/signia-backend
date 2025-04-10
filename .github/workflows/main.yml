@@ -1,0 +1,41 @@
+name: CI for Sign.ia Backend
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Clona el repositorio
+    - uses: actions/checkout@v3
+
+    # Configura Node.js
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    # Instala dependencias
+    - name: Install dependencies
+      run: npm install
+
+    # Configura variables de entorno
+    - name: Set up environment variables
+      run: |
+        echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> .env
+        echo "PORT=3000" >> .env
+
+    # Corre el servidor (en segundo plano)
+    - name: Start server
+      run: npm start &
+
+    # Prueba un endpoint (usando curl)
+    - name: Test API
+      run: |
+        sleep 5 # Espera a que el servidor arranque
+        curl http://localhost:3000/api
