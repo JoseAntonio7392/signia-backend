@@ -1,17 +1,10 @@
-# Sign.ia Backend
-Backend para la app Sign.ia, que traduce Lenguaje de Señas Mexicano (LSM) a voz y ofrece lecciones de LSM.
+Set-Content -Path README.md -Value @'
+# Lenguaje de Señas Mexicano
 
-## Endpoints
-- `GET /api`: Mensaje de bienvenida.
-- `POST /api/translate`: Traducción simulada de LSM a texto.
-- `GET /api/lessons`: Lista de lecciones.
-- `POST /api/lessons`: Añadir una lección.
+Aplicación web para traducción y aprendizaje de Lenguaje de Señas Mexicano (LSM).
 
 ## Instalación
-1. Clona el repositorio: `git clone https://github.com/JoseAntonio7392/signia-backend.git`
-2. Instala dependencias: `npm install`
-3. Configura la variable de entorno `MONGO_URI` en un archivo `.env`.
-4. Inicia el servidor: `npm start`
 
-## Notas
-- Este proyecto usa MongoDB Atlas para la base de datos.
+1. Entra al directorio:
+   ```powershell
+   cd C:\Users\ie512\Pictures\lenguaje-de-senas
