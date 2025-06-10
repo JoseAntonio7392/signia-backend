@@ -1,0 +1,1278 @@
+  <!DOCTYPE html>
+<html lang="es">
+<head>
+  
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprende Lengua de Señas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+        }
+        .main-button {
+            background: linear-gradient(45deg, #a855f7, #ec4899);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 10px;
+            transition: transform 0.3s ease;
+        }
+        .main-button:hover {
+            transform: scale(1.05);
+        }
+        .back-button, .user-button {
+            background: linear-gradient(45deg, #a855f7, #ec4899);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .card {
+            background: linear-gradient(45deg, #1e40af, #3b82f6);
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+            padding: 20px;
+        }
+        .card:hover {
+            transform: scale(1.03);
+        }
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+            overflow: hidden;
+            border-radius: 15px;
+        }
+        .carousel {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+        .carousel-item {
+            flex: 0 0 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(45deg, #1e40af, #3b82f6);
+            padding: 20px;
+        }
+        .carousel-item img {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+        .carousel-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            font-size: 2rem;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .carousel-nav:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+        .prev { left: 10px; }
+        .next { right: 10px; }
+        .status-text {
+            font-size: 1.25rem;
+            margin-top: 10px;
+        }
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        .debug-text {
+            background: rgba(52, 211, 153, 0.1);
+            color: #34d399;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        .video-container {
+            position: relative;
+            max-width: 640px;
+            margin: 0 auto;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(45deg, #a855f7, #ec4899);
+            padding: 10px;
+        }
+        .video-container.hands-detected {
+            border: 4px solid #34d399;
+        }
+        video {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        canvas {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: calc(100% - 20px);
+            height: calc(100% - 20px);
+            border-radius: 10px;
+        }
+        .combobox {
+            background: #1e40af;
+            border: 8px solid #a855f7;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 300px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        .combobox:focus {
+            border-color: #ec4899;
+            outline: none;
+        }
+        .blink {
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+        .option-button {
+            background: linear-gradient(45deg, #a855f7, #ec4899);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 10px;
+            transition: transform 0.3s ease;
+        }
+        .option-button:hover {
+            transform: scale(1.05);
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+        .modal-content {
+            background: linear-gradient(45deg, #1e40af, #3b82f6);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        .modal-content img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #a855f7;
+            margin-bottom: 10px;
+        }
+        .modal-content input[type="text"] {
+            background: #1e40af;
+            border: 2px solid #a855f7;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 300px;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+        .modal-content input[type="text"]:focus {
+            border-color: #ec4899;
+            outline: none;
+        }
+        .modal-content input[type="file"] {
+            margin: 10px 0;
+            color: white;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1640029074/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1646424915/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3.1620248257/drawing_utils.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <canvas id="starfield"></canvas>
+    <div id="app" class="container mx-auto p-6"></div>
+
+    <script>
+        console.log('[DEBUG] Script started at ' + new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+
+        // Starfield and Moon animation
+        const starfield = document.getElementById('starfield');
+        const ctxStarfield = starfield.getContext('2d');
+        let stars = [];
+        let moon = { x: 100, y: 100, radius: 30, phase: 0, glow: 0 };
+
+        function initStars() {
+            starfield.width = window.innerWidth;
+            starfield.height = window.innerHeight;
+            stars = [];
+            for (let i = 0; i < 100; i++) {
+                stars.push({
+                    x: Math.random() * starfield.width,
+                    y: Math.random() * starfield.height,
+                    radius: Math.random() * 2,
+                    speed: Math.random() * 0.5 + 0.1
+                });
+            }
+            moon.x = starfield.width * 0.2;
+            moon.y = starfield.height * 0.2;
+        }
+
+        function animateStarsAndMoon() {
+            ctxStarfield.clearRect(0, 0, starfield.width, starfield.height);
+            // Draw stars
+            ctxStarfield.fillStyle = 'white';
+            stars.forEach(star => {
+                ctxStarfield.beginPath();
+                ctxStarfield.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctxStarfield.fill();
+                star.y += star.speed;
+                if (star.y > starfield.height) star.y = 0;
+            });
+            // Draw moon with glow
+            moon.phase += 0.01;
+            moon.glow = 0.5 + Math.sin(moon.phase) * 0.2;
+            ctxStarfield.beginPath();
+            const gradient = ctxStarfield.createRadialGradient(
+                moon.x, moon.y, moon.radius * 0.5,
+                moon.x, moon.y, moon.radius * (1 + moon.glow)
+            );
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+            gradient.addColorStop(0.7, 'rgba(255, 255, 255, 0.4)');
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            ctxStarfield.fillStyle = gradient;
+            ctxStarfield.arc(moon.x, moon.y, moon.radius, 0, Math.PI * 2);
+            ctxStarfield.fill();
+            // Moon craters
+            ctxStarfield.fillStyle = 'rgba(200, 200, 200, 0.5)';
+            ctxStarfield.beginPath();
+            ctxStarfield.arc(moon.x - 10, moon.y - 5, 5, 0, Math.PI * 2);
+            ctxStarfield.arc(moon.x + 8, moon.y + 5, 3, 0, Math.PI * 2);
+            ctxStarfield.fill();
+            // Moon movement
+            moon.x += Math.sin(moon.phase * 0.5) * 0.2;
+            moon.y += Math.cos(moon.phase * 0.5) * 0.1;
+            requestAnimationFrame(animateStarsAndMoon);
+        }
+
+        window.addEventListener('resize', () => {
+            initStars();
+        });
+        initStars();
+        animateStarsAndMoon();
+
+        const app = document.getElementById('app');
+        let cameraInstance = null;
+        let landmarkHistory = [];
+        const HISTORY_SIZE = 15;
+        let smoothedLandmarks = [];
+        let currentVideo = null;
+        let lastDetectedSign = null;
+        let selectedVoice = null;
+        let handsInstance = null;
+        let lastFrameTime = 0;
+        const TARGET_FPS = 30;
+        const FRAME_INTERVAL = 1000 / TARGET_FPS;
+        const INAPPROPRIATE_SIGNS = ['Pinche', 'Puto', 'Chinga', 'Pendejo', 'Cabrón', 'Inapropiado1', 'Inapropiado2'];
+        let sePuedeDetectar = true;
+        let ultimaSeña = null;
+
+        const SIGN_DEFINITIONS = [
+            { name: 'Hola', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: 'horizontal', wristY: null }},
+            { name: 'Adiós', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: 'horizontal', wristY: '>0.2' }},
+            { name: 'Nosotros', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: 'arc', wristY: null }},
+            { name: 'Cómo estás', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: 'arc', wristY: null }},
+            { name: 'Hasta luego', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: 'horizontal', wristY: null }},
+            { name: 'Buenos días', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: 'vertical', wristY: null }},
+            { name: 'Buenas noches', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: 'vertical', wristY: null }},
+            { name: 'Gracias', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: 'vertical', wristY: null }},
+            { name: 'Por favor', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: 'arc', wristY: null }},
+            { name: 'Perdón', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'forward', movement: 'vertical', wristY: '<0.4' }},
+            { name: 'A', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'B', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'C', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'side', movement: null, wristY: null }},
+            { name: 'D', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'E', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'F', conditions: { fingers: { index: 'folded', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'G', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'side', movement: null, wristY: null }},
+            { name: 'H', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'side', movement: null, wristY: null }},
+            { name: 'I', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'J', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: 'arc', wristY: null }},
+            { name: 'K', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'L', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'M', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'down', movement: null, wristY: null }},
+            { name: 'N', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'down', movement: null, wristY: null }},
+            { name: 'Ñ', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: 'twist', wristY: null }},
+            { name: 'O', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'side', movement: null, wristY: null }},
+            { name: 'P', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'down', movement: null, wristY: null }},
+            { name: 'Q', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'down', movement: null, wristY: null }},
+            { name: 'R', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'S', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'T', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'U', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'V', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'W', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'X', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'side', movement: null, wristY: null }},
+            { name: 'Y', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'Z', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: 'zigzag', wristY: null }},
+            { name: '1', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
+            { name: '2', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
+            { name: '3', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
+            { name: '4', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: null, wristY: null }},
+            { name: '5', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
+            { name: '6', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
+            { name: '7', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'side', movement: null, wristY: null }},
+            { name: '8', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'side', movement: null, wristY: null }},
+            { name: '9', conditions: { fingers: { index: 'folded', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'side', movement: null, wristY: null }},
+            { name: '10', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'Mamá', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: null, wristY: '<0.3' }},
+            { name: 'Papá', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: null, wristY: '>0.4' }},
+            { name: 'Hermano', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'Hermana', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: 'vertical', wristY: null }},
+            { name: 'Rojo', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'Azul', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'side', movement: null, wristY: null }},
+            { name: 'Verde', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: 'twist', wristY: null }},
+            { name: 'Amarillo', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: '>0.3' }},
+            { name: 'Blanco', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'Negro', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'Gris', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'side', movement: 'horizontal', wristY: null }},
+            { name: 'Rosa', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'Morado', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: 'arc', wristY: null }},
+            { name: 'Naranja', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'side', movement: null, wristY: null }},
+            { name: 'Café', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: 'vertical', wristY: null }},
+            { name: 'Casa', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: 'vertical', wristY: null }},
+            { name: 'Escuela', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: 'vertical', wristY: null }},
+            { name: 'Yo', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'Tú', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'Familia', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: 'vertical', wristY: null }},
+            { name: 'Amigo', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: 'horizontal', wristY: null }},
+            { name: 'Comida', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: '<0.3' }},
+            { name: 'Agua', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'side', movement: null, wristY: null }},
+            { name: 'Sol', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'up', movement: 'arc', wristY: '>0.4' }},
+            { name: 'Luna', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'up', movement: 'arc', wristY: '>0.4' }},
+            { name: 'Siempre', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: 'arc', wristY: '>0.3' }},
+            { name: 'Nunca', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'towardUser', movement: 'horizontal', wristY: null }},
+            { name: 'Tiempo', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'side', movement: 'arc', wristY: null }},
+            { name: 'Feliz', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: 'arc', wristY: '>0.3' }},
+            { name: 'Triste', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'forward', movement: 'vertical', wristY: '<0.3' }},
+            { name: 'Amor', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: 'vertical', wristY: null }},
+            { name: 'Trabajo', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'down', movement: 'horizontal', wristY: null }},
+            { name: 'Libro', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'Música', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: 'arc', wristY: null }},
+            { name: 'Día', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'up', movement: null, wristY: '>0.4' }},
+            { name: 'Pinche', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'Puto', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'towardUser', movement: null, wristY: null }},
+            { name: 'Chinga', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'towardUser', movement: null, wristY: null }},
+            { name: 'Pendejo', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'Cabrón', conditions: { fingers: { index: 'folded', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'towardUser', movement: null, wristY: null }},
+            { name: 'Inapropiado1', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: null, wristY: null }},
+            { name: 'Inapropiado2', conditions: { fingers: { index: 'folded', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'towardUser', movement: null, wristY: null }},
+            // Additional signs
+            { name: 'Abuelo', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: null, wristY: '>0.5' }},
+            { name: 'Abuela', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: null, wristY: '<0.2' }},
+            { name: 'Escuchar', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'side', movement: null, wristY: null }},
+            { name: 'Hablar', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: 'arc', wristY: '<0.3' }},
+            { name: 'Calle', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'down', movement: 'horizontal', wristY: null }},
+            { name: 'Ciudad', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: 'vertical', wristY: '>0.4' }},
+            { name: 'Perro', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'down', movement: null, wristY: null }},
+            { name: 'Gato', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: 'arc', wristY: null }},
+            { name: 'Estrella', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'up', movement: null, wristY: '>0.5' }}
+        ];
+
+        function normalizeLandmarks(landmarks) {
+            const wrist = landmarks[0];
+            const indexMCP = landmarks[5];
+            const handSize = Math.sqrt(
+                Math.pow(indexMCP.x - wrist.x, 2) +
+                Math.pow(indexMCP.y - wrist.y, 2) +
+                Math.pow(indexMCP.z - wrist.z, 2)
+            );
+            return landmarks.map(lm => ({
+                x: (lm.x - wrist.x) / (handSize || 1),
+                y: (lm.y - wrist.y) / (handSize || 1),
+                z: (lm.z - wrist.z) / (handSize || 1)
+            }));
+        }
+
+        function smoothLandmarks(landmarks) {
+            if (smoothedLandmarks.length === 0) {
+                smoothedLandmarks = landmarks.map(lm => ({ x: lm.x, y: lm.y, z: lm.z }));
+                return landmarks;
+            }
+            const SMOOTHER_FACTOR = 0.4;
+            const smooth = landmarks.map((lm, i) => {
+                const prev = smoothedLandmarks[i] || { x: lm.x, y: lm.y, z: lm.z };
+                return {
+                    x: prev.x + SMOOTHER_FACTOR * (lm.x - prev.x),
+                    y: prev.y + SMOOTHER_FACTOR * (lm.y - prev.y),
+                    z: prev.z + SMOOTHER_FACTOR * (lm.z - prev.z)
+                };
+            });
+            smoothedLandmarks = smooth;
+            return smooth;
+        }
+
+        function distanciaEuclidiana(a, b) {
+            return Math.sqrt(
+                Math.pow(a.x - b.x, 2) +
+                Math.pow(a.y - b.y, 2) +
+                Math.pow(a.z - b.z, 2)
+            );
+        }
+
+        function estaDedoDoblado(tip, mcp, umbral = 0.04) {
+            return distanciaEuclidiana(tip, mcp) < umbral;
+        }
+
+        function estaDedoExtendido(tip, mcp, umbral = 0.08) {
+            return distanciaEuclidiana(tip, mcp) > umbral;
+        }
+
+        function detectLSMSign(landmarks, history, handedness) {
+            if (!landmarks || !history || !handedness) {
+                console.log('[DEBUG] Missing data: landmarks=', !!landmarks, 'history=', !!history, 'handedness=', !!handedness);
+                return null;
+            }
+
+            if (history.length > HISTORY_SIZE) history.shift();
+
+            landmarks = smoothLandmarks(landmarks);
+            const normalizedLandmarks = normalizeLandmarks(landmarks.map(lm => ({ x: 1 - lm.x, y: lm.y, z: -lm.z })));
+
+            const thumbTip = normalizedLandmarks[4];
+            const indexTip = normalizedLandmarks[8];
+            const middleTip = normalizedLandmarks[12];
+            const ringTip = normalizedLandmarks[16];
+            const pinkyTip = normalizedLandmarks[20];
+            const indexMCP = normalizedLandmarks[5];
+            const wrist = normalizedLandmarks[0];
+            const indexBase = normalizedLandmarks[5];
+            const pinkyBase = normalizedLandmarks[17];
+
+            const palmVector = { x: indexTip.x - wrist.x, y: indexTip.y - wrist.y, z: indexTip.z - wrist.z };
+            const palmNormal = { x: (indexBase.y - pinkyBase.y), y: -(indexBase.x - pinkyBase.x), z: 0 };
+            const magnitude = Math.sqrt(palmNormal.x ** 2 + palmNormal.y ** 2);
+            palmNormal.x /= magnitude || 1;
+            palmNormal.y /= magnitude || 1;
+
+            const palmForward = thumbTip.z < -0.01 && indexTip.z < -0.01;
+            const palmSide = Math.abs(thumbTip.z) < 0.025 && Math.abs(indexTip.z) < 0.025;
+            const palmTowardUser = thumbTip.z > 0.01 && indexTip.z > 0.01;
+            const palmUp = palmNormal.y >= 0.3;
+            const palmDown = palmNormal.y <= -0.3;
+
+            const isIndexFolded = estaDedoDoblado(indexTip, indexMCP);
+            const isMiddleFolded = estaDedoDoblado(middleTip, normalizedLandmarks[9]);
+            const isRingFolded = estaDedoDoblado(ringTip, normalizedLandmarks[13]);
+            const isPinkyFolded = estaDedoDoblado(pinkyTip, normalizedLandmarks[17]);
+            const isIndexExtended = estaDedoExtendido(indexTip, indexMCP);
+            const isMiddleExtended = estaDedoExtendido(middleTip, normalizedLandmarks[9]);
+            const isRingExtended = estaDedoExtendido(ringTip, normalizedLandmarks[13]);
+            const isPinkyExtended = estaDedoExtendido(pinkyTip, normalizedLandmarks[17]);
+            const isThumbExtended = distanciaEuclidiana(thumbTip, indexMCP) > 0.06;
+            const isThumbFolded = distanciaEuclidiana(thumbTip, indexMCP) < 0.04;
+
+            let isMovingHorizontally = false, isMovingVertically = false, isMovingInArc = false, isMovingInTwist = false, isMovingInZigzag = false;
+            if (history.length >= HISTORY_SIZE) {
+                const recentTips = history.slice(-HISTORY_SIZE).map(h => ({ x: 1 - h.landmarks[0].x, y: h.landmarks[0].y, z: -h.landmarks[0].z }));
+                const dx = recentTips[recentTips.length - 1].x - recentTips[0].x;
+                const dy = recentTips[recentTips.length - 1].y - recentTips[0].y;
+                isMovingHorizontally = Math.abs(dx) > 0.0004 && Math.abs(dy) < 0.007;
+                isMovingVertically = Math.abs(dy) > 0.0004 && Math.abs(dx) < 0.007;
+                isMovingInArc = Math.abs(dx) > 0.0004 && Math.abs(dy) > 0.0004;
+
+                const wristAngles = history.slice(-HISTORY_SIZE).map(h => {
+                    const lm = normalizeLandmarks(h.landmarks.map(lm => ({ x: 1 - lm.x, y: lm.y, z: -lm.z })));
+                    const v1 = { x: lm[5].x - lm[0].x, y: lm[5].y - lm[0].y };
+                    return Math.atan2(v1.y, v1.x);
+                });
+                const angleChange = Math.abs(wristAngles[wristAngles.length - 1] - wristAngles[0]);
+                isMovingInTwist = angleChange > 0.04;
+
+                let directionChanges = 0;
+                for (let i = 1; i < recentTips.length - 1; i++) {
+                    const dx1 = recentTips[i].x - recentTips[i - 1].x;
+                    const dx2 = recentTips[i + 1].x - recentTips[i].x;
+                    if (dx1 * dx2 < 0) directionChanges++;
+                }
+                isMovingInZigzag = directionChanges >= 1 && Math.abs(dx) > 0.0004;
+            }
+
+            let bestMatch = null;
+            let bestScore = -1;
+            let debugReasons = [];
+            for (const sign of SIGN_DEFINITIONS) {
+                const { fingers, palm, movement, wristY } = sign.conditions;
+                let fingersMatch = !fingers || (
+                    (!fingers.index || (fingers.index === 'extended' ? isIndexExtended : isIndexFolded)) &&
+                    (!fingers.middle || (fingers.middle === 'extended' ? isMiddleExtended : isMiddleFolded)) &&
+                    (!fingers.ring || (fingers.ring === 'extended' ? isRingExtended : isRingFolded)) &&
+                    (!fingers.pinky || (fingers.pinky === 'extended' ? isPinkyExtended : isPinkyFolded)) &&
+                    (!fingers.thumb || (fingers.thumb === 'extended' ? isThumbExtended : isThumbFolded))
+                );
+                let palmMatch = !palm || (
+                    (palm === 'forward' && palmForward) ||
+                    (palm === 'side' && palmSide) ||
+                    (palm === 'towardUser' && palmTowardUser) ||
+                    (palm === 'up' && palmUp) ||
+                    (palm === 'down' && palmDown)
+                );
+                let movementMatch = !movement || (
+                    (movement === 'horizontal' && isMovingHorizontally) ||
+                    (movement === 'vertical' && isMovingVertically) ||
+                    (movement === 'arc' && isMovingInArc) ||
+                    (movement === 'twist' && isMovingInTwist) ||
+                    (movement === 'zigzag' && isMovingInZigzag) ||
+                    (movement === null && !isMovingHorizontally && !isMovingVertically && !isMovingInArc && !isMovingInTwist && !isMovingInZigzag)
+                );
+                let wristYMatch = !wristY || (
+                    (wristY === null || wristY === 'null') ||
+                    (wristY.startsWith('<') && wrist.y < parseFloat(wristY.slice(1))) ||
+                    (wristY.startsWith('>') && wrist.y > parseFloat(wristY.slice(1)))
+                );
+
+                if (fingersMatch && palmMatch && movementMatch && wristYMatch && sePuedeDetectar) {
+                    let score = 0;
+                    if (fingersMatch) score += 1.0;
+                    if (palmMatch) score += 0.3;
+                    if (movementMatch) score += 0.1;
+                    if (wristYMatch) score += 0.1;
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMatch = sign.name;
+                    }
+                } else {
+                    debugReasons.push(
+                        `Sign ${sign.name} failed: ` +
+                        `fingers=${fingersMatch} (index=${isIndexExtended}/${isIndexFolded}, middle=${isMiddleExtended}/${isMiddleFolded}, ring=${isRingExtended}/${isRingFolded}, pinky=${isPinkyExtended}/${isPinkyFolded}, thumb=${isThumbExtended}/${isThumbFolded}), ` +
+                        `palm=${palmMatch} (forward=${palmForward}, side=${palmSide}, towardUser=${palmTowardUser}, up=${palmUp}, down=${palmDown}), ` +
+                        `movement=${movementMatch} (horz=${isMovingHorizontally}, vert=${isMovingVertically}, arc=${isMovingInArc}, twist=${isMovingInTwist}, zigzag=${isMovingInZigzag}), ` +
+                        `wristY=${wristYMatch} (y=${wrist.y.toFixed(2)}), canDetect=${sePuedeDetectar}`
+                    );
+                }
+            }
+
+            if (bestMatch) {
+                sePuedeDetectar = false;
+                ultimaSeña = bestMatch;
+                setTimeout(() => { sePuedeDetectar = true; }, 300);
+                console.log(`[DEBUG] Sign detected: ${bestMatch} (score: ${bestScore.toFixed(2)})`);
+                return bestMatch;
+            } else {
+                console.log('[DEBUG] No sign detected. Reasons:\n' + debugReasons.join('\n'));
+                return null;
+            }
+        }
+
+        function clearScreen() {
+            app.innerHTML = '';
+            stopCamera();
+            currentVideo = null;
+            console.log('[DEBUG] Screen cleared');
+        }
+
+        function renderMainScreen() {
+            clearScreen();
+            app.innerHTML = `
+                <div class="relative min-h-screen flex flex-col items-center justify-center text-white text-center px-4 animate-fade-in">
+                    <button class="user-button absolute top-4 right-4" id="userButton">Usuario</button>
+                    <img src="assets/img/logo.jpg" alt="Logo" class="header-logo w-24 h-24 md:w-28 md:h-28 mb-6" />
+                    <h1 class="text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600 mb-10 drop-shadow-lg">
+                        Aprende Lengua de Señas
+                    </h1>
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <button id="btnTraduccion" class="option-button text-xl">
+                            🔤 Traducción
+                        </button>
+                        <button id="btnAprendizaje" class="option-button text-xl">
+                            📚 Aprendizaje
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('btnTraduccion').addEventListener('click', renderTraduccionScreen);
+            document.getElementById('btnAprendizaje').addEventListener('click', renderAprendizajeScreen);
+            document.getElementById('userButton').addEventListener('click', renderUserScreen);
+            console.log('[DEBUG] Main screen rendered');
+        }
+
+        function renderUserScreen() {
+            const userName = localStorage.getItem('userName') || 'Usuario Ejemplo';
+            const profilePicture = localStorage.getItem('profilePicture') || 'https://via.placeholder.com/100?text=User';
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <img src="${profilePicture}" alt="User Profile" id="profilePicture" />
+                    <input type="text" id="userNameInput" value="${userName}" placeholder="Ingresa tu nombre" />
+                    <input type="file" id="profilePictureInput" accept="image/*" />
+                    <button class="back-button mt-4" id="saveUserProfile">Guardar</button>
+                    <button class="back-button mt-2" id="closeUserModal">Cerrar</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            const userNameInput = document.getElementById('userNameInput');
+            const profilePictureInput = document.getElementById('profilePictureInput');
+            const profilePictureImg = document.getElementById('profilePicture');
+
+            profilePictureInput.addEventListener('change', () => {
+                const file = profilePictureInput.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        profilePictureImg.src = e.target.result;
+                        localStorage.setItem('profilePicture', e.target.result);
+                        console.log('[DEBUG] Profile picture updated');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            document.getElementById('saveUserProfile').addEventListener('click', () => {
+                const newName = userNameInput.value.trim();
+                if (newName) {
+                    localStorage.setItem('userName', newName);
+                    console.log('[DEBUG] User name saved: ' + newName);
+                }
+            });
+
+            document.getElementById('closeUserModal').addEventListener('click', () => {
+                modal.remove();
+                console.log('[DEBUG] User modal closed');
+            });
+
+            console.log('[DEBUG] User screen rendered');
+        }
+
+        function renderTraduccionScreen() {
+            clearScreen();
+            app.innerHTML = `
+                <div class="relative min-h-screen flex flex-col items-center justify-center">
+                    <button class="user-button absolute top-4 right-4" id="userButton">Usuario</button>
+                    <button class="back-button absolute top-4 left-4" id="backToMenu">← Volver</button>
+                    <h2 class="text-3xl font-semibold text-center mb-6">Traducción en Tiempo Real</h2>
+                    <div id="videoContainer" class="video-container">
+                        <video id="video" autoplay playsinline></video>
+                        <canvas id="canvas"></canvas>
+                    </div>
+                    <div class="text-center mt-6">
+                        <label for="voiceSelect" class="text-lg">Seleccionar voz:</label>
+                        <select id="voiceSelect" class="combobox mt-2">
+                            <option value="" disabled selected>Elige una voz</option>
+                        </select>
+                        <p id="status" class="status-text mt-4">Iniciando cámara...</p>
+                        <p id="gesture" class="status-text mt-2">Seña detectada: Ninguna</p>
+                        <div id="errorMessage" class="error-message hidden mt-4"></div>
+                        <div id="debugMessage" class="debug-text hidden mt-4"></div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('backToMenu').addEventListener('click', renderMainScreen);
+            document.getElementById('userButton').addEventListener('click', renderUserScreen);
+            populateVoiceSelect();
+            startCamera();
+            console.log('[DEBUG] Traducción screen rendered');
+        }
+
+        function populateVoiceSelect() {
+            const voiceSelect = document.getElementById('voiceSelect');
+            if (!voiceSelect) return;
+
+            const updateVoices = () => {
+                const voices = speechSynthesis.getVoices();
+                voiceSelect.innerHTML = '<option value="" disabled selected>Elige una voz</option>';
+                if (voices.length === 0) {
+                    voiceSelect.innerHTML += '<option value="" disabled>No hay voces disponibles</option>';
+                    console.warn('[DEBUG] No voices available');
+                    return;
+                }
+                const spanishVoices = voices.filter(v => v.lang.startsWith('es-'));
+                const otherVoices = voices.filter(v => !v.lang.startsWith('es-'));
+                [...spanishVoices, ...otherVoices].forEach((voice, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    voiceSelect.appendChild(option);
+                });
+                if (spanishVoices.length > 0) {
+                    selectedVoice = spanishVoices[0];
+                    voiceSelect.value = voices.indexOf(spanishVoices[0]);
+                } else if (voices.length > 0) {
+                    selectedVoice = voices[0];
+                    voiceSelect.value = 0;
+                }
+            };
+
+            if (speechSynthesis.getVoices().length > 0) {
+                updateVoices();
+            } else {
+                speechSynthesis.onvoiceschanged = updateVoices;
+            }
+
+            voiceSelect.addEventListener('change', () => {
+                const voices = speechSynthesis.getVoices();
+                selectedVoice = voices[voiceSelect.value] || null;
+                console.log(`[DEBUG] Voice selected: ${selectedVoice ? selectedVoice.name : 'None'}`);
+            });
+        }
+
+        function renderAprendizajeScreen() {
+            clearScreen();
+            app.innerHTML = `
+                <div class="relative min-h-screen flex flex-col items-center justify-center">
+                    <button class="user-button absolute top-4 right-4" id="userButton">Usuario</button>
+                    <button class="back-button absolute top-4 left-4" id="backToMenu2">← Volver</button>
+                    <h2 class="text-3xl font-semibold text-center mb-6">Módulo de Aprendizaje</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <button id="videoButton" class="card p-6 text-center">Vídeos</button>
+                        <button id="imageButton" class="card p-6 text-center">Imágenes</button>
+                    </div>
+                    <div id="contentContainer" class="mt-6"></div>
+                </div>
+            `;
+            document.getElementById('backToMenu2').addEventListener('click', renderMainScreen);
+            document.getElementById('userButton').addEventListener('click', renderUserScreen);
+            document.getElementById('videoButton').addEventListener('click', () => showCategories('videos'));
+            document.getElementById('imageButton').addEventListener('click', () => showCategories('images'));
+            console.log('[DEBUG] Aprendizaje screen rendered');
+        }
+
+        function showCategories(type) {
+            const contentContainer = document.getElementById('contentContainer');
+            contentContainer.innerHTML = `<div class="debug-text">Cargando categorías de ${type}...</div>`;
+
+            const subfolders = ['abecedario', 'animales', 'casa', 'colores', 'comida', 'cuerpo', 'diasdesemana', 'escuela', 'estaciones', 'meses', 'tiempo', 'saludos'];
+            contentContainer.innerHTML = `
+                <h3 class="text-2xl font-semibold mb-4">Categorías de ${type.charAt(0).toUpperCase() + type.slice(1)}</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    ${subfolders.map(folder => `
+                        <button class="category-button card p-3 text-center" data-type="${type}" data-folder="${folder}">
+                            ${folder.charAt(0).toUpperCase() + folder.slice(1)}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+
+            document.querySelectorAll('.category-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const type = button.dataset.type;
+                    const folder = button.dataset.folder;
+                    if (type === 'videos') showVideos(folder);
+                    else showImages(folder);
+                });
+            });
+            console.log('[DEBUG] Categories loaded: ' + type);
+        }
+
+        function showVideos(folder) {
+            const contentContainer = document.getElementById('contentContainer');
+            contentContainer.innerHTML = `
+                <h3 class="text-2xl font-semibold mb-4">${folder.charAt(0).toUpperCase() + folder.slice(1)}</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="card p-4 text-center">
+                        <video controls preload="metadata" class="w-full max-w-md rounded-lg">
+                            <source src="assets/videos/${folder}/Video1.mp4" type="video/mp4, ">
+                            Tu navegador no soporta el elemento de video.
+                        </video>
+                        <p class="mt-2">Vídeo: Lengua de Señas - ${folder}</p>
+                    </div>
+                </div>
+            `;
+            console.log('[DEBUG] Vídeos loaded for: ' + folder);
+        }
+
+        function showImages(folder) {
+            const contentContainer = document.getElementById('contentContainer');
+            contentContainer.innerHTML = '<div class="debug-text">Cargando imágenes...</div>';
+            const images = fetchImages(folder);
+            contentContainer.innerHTML = `
+                <h3 class="text-2xl font-semibold mb-4">${folder.charAt(0).toUpperCase() + folder.slice(1)}</h3>
+                ${images.length === 0 ? '<div class="error-message">No hay imágenes en esta categoría.</div>' : `
+                    <div class="carousel-container">
+                        <div class="carousel" id="carousel">
+                            ${images.map(img => `
+                                <div class="carousel-item">
+                                    <img src="${img.path}" alt="${img.name}">
+                                    <p class="mt-2">${img.name}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button class="carousel-nav prev" onclick="moveCarousel(-1)">←</button>
+                        <button class="carousel-nav next" onclick="moveCarousel(1)">→</button>
+                    </div>
+                `}
+            `;
+            contentContainer.querySelectorAll('img').forEach(img => {
+                img.onload = () => console.log('[DEBUG] Image loaded: ' + img.src);
+                img.onerror = () => {
+                    console.error('[ERROR] Image failed to load: ' + img.src);
+                    img.parentElement.innerHTML += '<div class="error-message">No se pudo cargar la imagen.</div>';
+                };
+            });
+            initializeCarousel();
+            console.log('[DEBUG] Images loaded for: ' + folder);
+        }
+
+        function fetchImages(folder) {
+            const basePath = `assets/img/${folder}/`;
+            const images = {
+                abecedario: [
+                    { name: 'letra_A.jpg', path: `${basePath}letra_A.jpg` },
+                    { name: 'letra_B.jpg', path: `${basePath}letra_B.jpg` },
+                    { name: 'letra_C.jpg', path: `${basePath}letra_C.jpg` },
+                    { name: 'letra_D.jpg', path: `${basePath}letra_D.jpg` },
+                    { name: 'letra_E.jpg', path: `${basePath}letra_E.jpg` },
+                    { name: 'letra_F.jpg', path: `${basePath}letra_F.jpg` },
+                    { name: 'letra_G.jpg', path: `${basePath}letra_G.jpg` },
+                    { name: 'letra_H.jpg', path: `${basePath}letra_H.jpg` },
+                    { name: 'letra_I.jpg', path: `${basePath}letra_I.jpg` },
+                    { name: 'letra_J.jpg', path: `${basePath}letra_J.jpg` },
+                    { name: 'letra_K.jpg', path: `${basePath}letra_K.jpg` },
+                    { name: 'letra_L.jpg', path: `${basePath}letra_L.jpg` },
+                    { name: 'letra_M.jpg', path: `${basePath}letra_M.jpg` },
+                    { name: 'letra_N.jpg', path: `${basePath}letra_N.jpg` },
+                    { name: 'letra_O.jpg', path: `${basePath}letra_O.jpg` },
+                    { name: 'letra_P.jpg', path: `${basePath}letra_P.jpg` },
+                    { name: 'letra_Q.jpg', path: `${basePath}letra_Q.jpg` },
+                    { name: 'letra_R.jpg', path: `${basePath}letra_R.jpg` },
+                    { name: 'letra_S.jpg', path: `${basePath}letra_S.jpg` },
+                    { name: 'letra_T.jpg', path: `${basePath}letra_T.jpg` },
+                    { name: 'letra_U.jpg', path: `${basePath}letra_U.jpg` },
+                    { name: 'letra_V.jpg', path: `${basePath}letra_V.jpg` },
+                    { name: 'letra_W.jpg', path: `${basePath}letra_W.jpg` },
+                    { name: 'letra_X.jpg', path: `${basePath}letra_X.jpg` },
+                    { name: 'letra_Y.jpg', path: `${basePath}letra_Y.jpg` },
+                    { name: 'letra_Z.jpg', path: `${basePath}letra_Z.jpg` }
+                ],
+                animales: [
+                    { name: 'imagen_panda.jpg', path: `${basePath}imagen_panda.jpg` },
+                    { name: 'imagen_perro.jpg', path: `${basePath}imagen_perro.jpg` },
+                    { name: 'imagen_puerco.jpg', path: `${basePath}imagen_puerco.jpg` },
+                    { name: 'imagen_rinoceronte.jpg', path: `${basePath}imagen_rinoceronte.jpg` },
+                    { name: 'imagen_serpiente.jpg', path: `${basePath}imagen_serpiente.jpg` },
+                    { name: 'imagen_tiburon.jpg', path: `${basePath}imagen_tiburon.jpg` },
+                    { name: 'imagen_tigre.jpg', path: `${basePath}imagen_tigre.jpg` },
+                    { name: 'imagen_toro.jpg', path: `${basePath}imagen_toro.jpg` },
+                    { name: 'imagen_vaca.jpg', path: `${basePath}imagen_vaca.jpg` }
+                ],
+                casa: [
+                    { name: 'Captura de pantalla 2025-04-10 123015.png', path: `${basePath}Captura de pantalla 2025-04-10 123015.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123022.png', path: `${basePath}Captura de pantalla 2025-04-10 123022.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123028.png', path: `${basePath}Captura de pantalla 2025-04-10 123028.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123033.png', path: `${basePath}Captura de pantalla 2025-04-10 123033.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123039.png', path: `${basePath}Captura de pantalla 2025-04-10 123039.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123043.png', path: `${basePath}Captura de pantalla 2025-04-10 123043.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123047.png', path: `${basePath}Captura de pantalla 2025-04-10 123047.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123052.png', path: `${basePath}Captura de pantalla 2025-04-10 123052.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123100.png', path: `${basePath}Captura de pantalla 2025-04-10 123100.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123103.png', path: `${basePath}Captura de pantalla 2025-04-10 123103.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123112.png', path: `${basePath}Captura de pantalla 2025-04-10 123112.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123116.png', path: `${basePath}Captura de pantalla 2025-04-10 123116.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123120.png', path: `${basePath}Captura de pantalla 2025-04-10 123120.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123124.png', path: `${basePath}Captura de pantalla 2025-04-10 1230124.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123129.png', path: `${basePath}Captura de pantalla 2025-04-10 123129.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123132.png', path: `${basePath}Captura de pantalla 2025-04-10 123132.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123140.png', path: `${basePath}Captura de pantalla 2025-04-10 123140.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123145.png', path: `${basePath}Captura de pantalla 2025-04-10 123145.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123150.png', path: `${basePath}Captura de pantalla 2025-04-10 123150.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123155.png', path: `${basePath}Captura de pantalla 2025-04-10 123155.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123201.png', path: `${basePath}Captura de pantalla 2025-04-10 1230201.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123206.png', path: `${basePath}Captura de pantalla 2025-04-10 123206.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123213.png', path: `${basePath}Captura de pantalla 2025-04-10 123213.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123218.png', path: `${basePath}Captura de pantalla 2025-04-10 123218.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123223.png', path: `${basePath}Captura de pantalla 2025-04-10 123223.png` },
+                    { name: 'Captura de pantalla 2025-04-10 123229.png', path: `${basePath}Captura de pantalla 2025-04-10 123229.png` },
+                ],
+                colores: [
+                    { name: 'color_rojo.jpg', path: `${basePath}color_rojo.jpg` },
+                    { name: 'color_azul.jpg', path: `${basePath}color_azul.jpg` },
+                    { name: 'color_verde.jpg', path: `${basePath}color_verde.jpg` },
+                    { name: 'color_amarillo.jpg', path: `${basePath}color_amarillo.jpg` },
+                    { name: 'color_blanco.jpg', path: `${basePath}color_blanco.jpg` },
+                    { name: 'color_negro.jpg', path: `${basePath}color_negro.jpg` },
+                    { name: 'color_gris.jpg', path: `${basePath}color_gris.jpg` },
+                    { name: 'color_rosa.jpg', path: `${basePath}color_rosa.jpg` },
+                    { name: 'color_morado.jpg', path: `${basePath}color_morado.jpg` },
+                    { name: 'color_naranja.jpg', path: `${basePath}color_naranja.jpg` }
+                ],
+                comida: [
+                    { name: 'Captura de pantalla 2025-04-10 103815.png', path: `${basePath}Captura de pantalla 2025-04-10 123815.png` },
+                    { name: 'Captura de pantalla 2025-04-10 103826.png', path: `${basePath}Captura de pantalla 2025-04-10 123826.png` },
+                    { name: 'Captura de pantalla 2025-04-10 103838.png', path: `${basePath}Captura de pantalla 2025-04-10 123838.png` },
+                    { name: 'Captura de pantalla 2025-04-10 103853.png', path: `${basePath}Captura de pantalla 2025-04-10 123853.png` },
+                    { name: 'Captura de pantalla 2025-04-10 103905.png', path: `${basePath}Captura de pantalla 2025-04-10 123905.png` },
+                    { name: 'Captura de pantalla 2025-04-10 103923.png', path: `${basePath}Captura de pantalla 2025-04-10 123923.png` },
+                    { name: 'Captura de pantalla 2025-04-10 103940.png', path: `${basePath}Captura de pantalla 2025-04-10 123940.png` },
+                    { name: 'Captura de pantalla 2025-04-10 103953.png', path: `${basePath}Captura de pantalla 2025-04-10 123953.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104007.png', path: `${basePath}Captura de pantalla 2025-04-10 124007.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104019.png', path: `${basePath}Captura de pantalla 2025-04-10 124019.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104029.png', path: `${basePath}Captura de pantalla 2025-04-10 124029.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104046.png', path: `${basePath}Captura de pantalla 2025-04-10 124046.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104057.png', path: `${basePath}Captura de pantalla 2025-04-10 124057.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104109.png', path: `${basePath}Captura de pantalla 2025-04-10 124109.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104120.png', path: `${basePath}Captura de pantalla 2025-04-10 124120.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104515.png', path: `${basePath}Captura de pantalla 2025-04-10 124515.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104528.png', path: `${basePath}Captura de pantalla 2025-04-10 124528.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104538.png', path: `${basePath}Captura de pantalla 2025-04-10 124538.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104553.png', path: `${basePath}Captura de pantalla 2025-04-10 124553.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104640.png', path: `${basePath}Captura de pantalla 2025-04-10 124640.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104651.png', path: `${basePath}Captura de pantalla 2025-04-10 124651.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104703.png', path: `${basePath}Captura de pantalla 2025-04-10 124703.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104714.png', path: `${basePath}Captura de pantalla 2025-04-10 124714.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104725.png', path: `${basePath}Captura de pantalla 2025-04-10 124725.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104737.png', path: `${basePath}Captura de pantalla 2025-04-10 124737.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104749.png', path: `${basePath}Captura de pantalla 2025-04-10 124749.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104800.png', path: `${basePath}Captura de pantalla 2025-04-10 124800.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104815.png', path: `${basePath}Captura de pantalla 2025-04-10 124815.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104829.png', path: `${basePath}Captura de pantalla 2025-04-10 124829.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104853.png', path: `${basePath}Captura de pantalla 2025-04-10 124853.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104918.png', path: `${basePath}Captura de pantalla 2025-04-10 124918.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104928.png', path: `${basePath}Captura de pantalla 2025-04-10 124928.png` },
+                    { name: 'Captura de pantalla 2025-04-10 104939.png', path: `${basePath}Captura de pantalla 2025-04-10 124939.png` },
+                    { name: 'Captura de pantalla 2025-04-10 105253.png', path: `${basePath}Captura de pantalla 2025-04-10 125253.png` },
+                    { name: 'Captura de pantalla 2025-04-10 110151.png', path: `${basePath}Captura de pantalla 2025-04-10 110151.png` },
+                    { name: 'Captura de pantalla 2025-04-10 110204.png', path: `${basePath}Captura de pantalla 2025-04-10 110204.png` },
+                    { name: 'Captura de pantalla 2025-04-10 110224.png', path: `${basePath}Captura de pantalla 2025-04-10 110224.png` },
+                    { name: 'Captura de pantalla 2025-04-10 110238.png', path: `${basePath}Captura de pantalla 2025-04-10 110238.png` },
+                    { name: 'Captura de pantalla 2025-04-10 110250.png', path: `${basePath}Captura de pantalla 2025-04-10 110250.png` },
+                ],
+                cuerpo: [
+                    { name: 'cuerpo_mano.jpg', path: `${basePath}cuerpo_mano.jpg` },
+                    { name: 'cuerpo_pie.jpg', path: `${basePath}cuerpo_pie.jpg` },
+                    { name: 'cuerpo_cabeza.jpg', path: `${basePath}cuerpo_cabeza.jpg` },
+                    { name: 'cuerpo_brazo.jpg', path: `${basePath}cuerpo_brazo.jpg` },
+                    { name: 'cuerpo_pierna.jpg', path: `${basePath}cuerpo_pierna.jpg` }
+                ],
+                diasdesemana: [
+                    { name: 'lunes.jpg', path: `${basePath}lunes.jpg` },
+                    { name: 'martes.jpg', path: `${basePath}martes.jpg` },
+                    { name: 'miercoles.jpg', path: `${basePath}miercoles.jpg` },
+                    { name: 'jueves.jpg', path: `${basePath}jueves.jpg` },
+                    { name: 'viernes.jpg', path: `${basePath}viernes.jpg` },
+                    { name: 'sabado.jpg', path: `${basePath}sabado.jpg` },
+                    { name: 'domingo.jpg', path: `${basePath}domingo.jpg` }
+                ],
+                escuela: [
+                    { name: 'Captura de pantalla 2025-04-10 125135.png', path: `${basePath}Captura de pantalla 2025-04-10 125135.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125140.png', path: `${basePath}Captura de pantalla 2025-04-10 125140.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125144.png', path: `${basePath}Captura de pantalla 2025-04-10 125144.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125149.png', path: `${basePath}Captura de pantalla 2025-04-10 125149.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125153.png', path: `${basePath}Captura de pantalla 2025-04-10 125153.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125157.png', path: `${basePath}Captura de pantalla 2025-04-10 125157.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125203.png', path: `${basePath}Captura de pantalla 2025-04-10 125203.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125208.png', path: `${basePath}Captura de pantalla 2025-04-10 125208.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125212.png', path: `${basePath}Captura de pantalla 2025-04-10 125212.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125217.png', path: `${basePath}Captura de pantalla 2025-04-10 125217.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125222.png', path: `${basePath}Captura de pantalla 2025-04-10 125222.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125228.png', path: `${basePath}Captura de pantalla 2025-04-10 125228.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125233.png', path: `${basePath}Captura de pantalla 2025-04-10 125233.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125238.png', path: `${basePath}Captura de pantalla 2025-04-10 125238.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125243.png', path: `${basePath}Captura de pantalla 2025-04-10 125243.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125248.png', path: `${basePath}Captura de pantalla 2025-04-10 125248.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125252.png', path: `${basePath}Captura de pantalla 2025-04-10 125252.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125258.png', path: `${basePath}Captura de pantalla 2025-04-10 125258.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125258.png', path: `${basePath}Captura de pantalla 2025-04-10 125258.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125301.png', path: `${basePath}Captura de pantalla 2025-04-10 125301.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125306.png', path: `${basePath}Captura de pantalla 2025-04-10 125306.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125311.png', path: `${basePath}Captura de pantalla 2025-04-10 125311.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125315.png', path: `${basePath}Captura de pantalla 2025-04-10 125315.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125319.png', path: `${basePath}Captura de pantalla 2025-04-10 125319.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125325.png', path: `${basePath}Captura de pantalla 2025-04-10 125325.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125329.png', path: `${basePath}Captura de pantalla 2025-04-10 125329.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125333.png', path: `${basePath}Captura de pantalla 2025-04-10 125333.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125341.png', path: `${basePath}Captura de pantalla 2025-04-10 125341.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125346.png', path: `${basePath}Captura de pantalla 2025-04-10 125346.png` },
+                    { name: 'Captura de pantalla 2025-04-10 125350.png', path: `${basePath}Captura de pantalla 2025-04-10 125350.png` },
+                ],
+                estaciones: [
+                    { name: 'Captura de pantalla 2025-04-10 121722.png', path: `${basePath}Captura de pantalla 2025-04-10 121722.png` },
+                    { name: 'Captura de pantalla 2025-04-10 121727.png', path: `${basePath}eCaptura de pantalla 2025-04-10 121727.png` },
+                    { name: 'Captura de pantalla 2025-04-10 121733.png', path: `${basePath}Captura de pantalla 2025-04-10 121733.png` },
+                    { name: 'Captura de pantalla 2025-04-10 121737.png', path: `${basePath}Captura de pantalla 2025-04-10 121737.png` }
+                    
+                ],
+                meses: [
+                    { name: 'mes_enero.png', path: `${basePath}mes_enero.png` },
+                    { name: 'mes_febrero.png', path: `${basePath}mes_febrero.png` },
+                    { name: 'mes_marzo.png', path: `${basePath}mes_marzo.png` },
+                    { name: 'mes_abril.png', path: `${basePath}mes_abril.png` },
+                    { name: 'mes_mayo.png', path: `${basePath}mes_mayo.png` },
+                    { name: 'mes_junio.png', path: `${basePath}mes_junio.png` },
+                    { name: 'mes_julio.png', path: `${basePath}mes_julio.png` },
+                    { name: 'mes_agosto.png', path: `${basePath}mes_agosto.png` },
+                    { name: 'mes_septiembre.png', path: `${basePath}mes_septiembre.png` },
+                    { name: 'mes_octubre.png', path: `${basePath}mes_octubre.png` },
+                    { name: 'mes_noviembre.png', path: `${basePath}mes_noviembre.png` },
+                    { name: 'mes_diciembre.png', path: `${basePath}mes_diciembre.` }
+                ],
+                tiempo: [
+                    { name: 'tiempo_sol.jpg', path: `${basePath}tiempo_sol.jpg` },
+                    { name: 'tiempo_lluvia.jpg', path: `${basePath}tiempo_lluvia.jpg` },
+                    { name: 'tiempo_nieve.jpg', path: `${basePath}tiempo_nieve.jpg` },
+                    { name: 'tiempo_viento.jpg', path: `${basePath}tiempo_viento.jpg` }
+                ],
+                saludos: [
+                    { name: 'saludo_hola.jpg', path: `${basePath}saludo_hola.jpg` },
+                    { name: 'saludo_adios.jpg', path: `${basePath}saludo_adios.jpg` },
+                    { name: 'saludo_gracias.jpg', path: `${basePath}saludo_gracias.jpg` },
+                    { name: 'saludo_por_favor.jpg', path: `${basePath}saludo_por_favor.jpg` }
+                ]
+            };
+            return images[folder] || [];
+        }
+
+        let currentIndex = 0;
+        function initializeCarousel() {
+            const carousel = document.getElementById('carousel');
+            if (!carousel) return;
+            const items = carousel.children.length;
+            if (items === 0) return;
+            currentIndex = 0;
+            carousel.style.transform = `translateX(0%)`;
+        }
+
+        function moveCarousel(direction) {
+            const carousel = document.getElementById('carousel');
+            if (!carousel) return;
+            const items = carousel.children.length;
+            if (items === 0) return;
+            currentIndex = (currentIndex + direction + items) % items;
+            carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+            console.log('[DEBUG] Carousel moved: index=' + currentIndex);
+        }
+
+        function startCamera() {
+            if (cameraInstance) {
+                console.log('[DEBUG] Camera already running');
+                return;
+            }
+
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const status = document.getElementById('status');
+            const gesture = document.getElementById('gesture');
+            const errorMessage = document.getElementById('errorMessage');
+            const debugMessage = document.getElementById('debugMessage');
+            const videoContainer = document.getElementById('videoContainer');
+
+            if (!video || !canvas || !status || !gesture || !errorMessage || !debugMessage || !videoContainer) {
+                console.error('[ERROR] Missing DOM elements for camera');
+                errorMessage.textContent = 'Error: Elementos de la interfaz no encontrados.';
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+
+            currentVideo = video;
+            const canvasCtx = canvas.getContext('2d');
+
+            handsInstance = new Hands({
+                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1646424915/${file}`
+            });
+
+            handsInstance.setOptions({
+                maxNumHands: 2,
+                modelComplexity: 1,
+                minDetectionConfidence: 0.7,
+                minTrackingConfidence: 0.7
+            });
+
+            handsInstance.setOptions({
+        maxNumHands: 2,
+        modelComplexity: 1,
+        minDetectionConfidence: 0.7,
+        minTrackingConfidence: 0.7
+    });
+
+    handsInstance.onResults((results) => {
+        const currentTime = performance.now();
+        if (currentTime - lastFrameTime < FRAME_INTERVAL) {
+            return; // Throttle to maintain target FPS
+        }
+        lastFrameTime = currentTime;
+
+        canvasCtx.save();
+        canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+        canvasCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        let detectedSign = null;
+        let debugInfo = [];
+
+        if (results.multiHandLandmarks && results.multiHandedness) {
+            videoContainer.classList.add('hands-detected');
+            status.textContent = 'Manos detectadas';
+            status.classList.remove('blink');
+
+            for (let i = 0; i < results.multiHandLandmarks.length; i++) {
+                const landmarks = results.multiHandLandmarks[i];
+                const handedness = results.multiHandedness[i];
+                drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, { color: '#34d399', lineWidth: 5 });
+                drawLandmarks(canvasCtx, landmarks, { color: '#a855f7', lineWidth: 2 });
+
+                landmarkHistory.push({ landmarks, handedness });
+                if (landmarkHistory.length > HISTORY_SIZE) {
+                    landmarkHistory.shift();
+                }
+
+                const sign = detectLSMSign(landmarks, landmarkHistory, handedness);
+                if (sign) {
+                    detectedSign = sign;
+                    debugInfo.push(`Mano ${i + 1} (${handedness.label}): ${sign}`);
+                } else {
+                    debugInfo.push(`Mano ${i + 1} (${handedness.label}): No detectada`);
+                }
+            }
+        } else {
+            videoContainer.classList.remove('hands-detected');
+            status.textContent = 'No se detectan manos';
+            status.classList.add('blink');
+            debugInfo.push('No se detectaron manos');
+        }
+
+        canvasCtx.restore();
+
+        if (detectedSign && detectedSign !== lastDetectedSign) {
+            if (INAPPROPRIATE_SIGNS.includes(detectedSign)) {
+                gesture.textContent = 'Seña detectada: [Inapropiada]';
+                errorMessage.textContent = 'Se detectó una seña inapropiada. Por favor, usa señas apropiadas.';
+                errorMessage.classList.remove('hidden');
+                debugMessage.textContent = `Seña detectada: ${detectedSign} (inapropiada)`;
+                debugMessage.classList.remove('hidden');
+            } else {
+                gesture.textContent = `Seña detectada: ${detectedSign}`;
+                errorMessage.classList.add('hidden');
+                debugMessage.textContent = debugInfo.join('\n');
+                debugMessage.classList.remove('hidden');
+
+                if (selectedVoice && 'speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(detectedSign);
+                    utterance.voice = selectedVoice;
+                    utterance.lang = selectedVoice ? selectedVoice.lang : 'es-MX';
+                    utterance.rate = 1.0;
+                    utterance.pitch = 1.0;
+                    speechSynthesis.cancel();
+                    speechSynthesis.speak(utterance);
+                    console.log(`[DEBUG] Speaking: ${detectedSign} with voice ${selectedVoice ? selectedVoice.name : 'default'}`);
+                } else {
+                    console.warn('[DEBUG] Speech synthesis not available or no voice selected');
+                }
+            }
+            lastDetectedSign = detectedSign;
+        } else if (!detectedSign) {
+            gesture.textContent = 'Seña detectada: Ninguna';
+            lastDetectedSign = null;
+        }
+
+        if (debugInfo.length > 0) {
+            console.log('[DEBUG] Frame processed:\n' + debugInfo.join('\n'));
+        }
+    });
+
+    navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: 640, height: 480 }
+    }).then(stream => {
+        video.srcObject = stream;
+        video.play().catch(err => {
+            console.error('[ERROR] Failed to play video:', err);
+            errorMessage.textContent = 'Error al reproducir el video. Verifica los permisos de la cámara.';
+            errorMessage.classList.remove('hidden');
+            status.textContent = 'Error en la cámara';
+            status.classList.add('blink');
+        });
+
+        video.onloadedmetadata = () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            cameraInstance = new Camera(video, {
+                onFrame: async () => {
+                    await handsInstance.send({ image: video });
+                },
+                width: video.videoWidth,
+                height: video.videoHeight
+            });
+            cameraInstance.start();
+            status.textContent = 'Cámara iniciada';
+            console.log('[DEBUG] Camera started with resolution ' + video.videoWidth + 'x' + video.videoHeight);
+        };
+    }).catch(err => {
+        console.error('[ERROR] Camera access denied:', err);
+        errorMessage.textContent = 'No se pudo acceder a la cámara. Por favor, permite el acceso.';
+        errorMessage.classList.remove('hidden');
+        status.textContent = 'Error: Cámara no disponible';
+        status.classList.add('blink');
+    });
+}
+
+function stopCamera() {
+    if (cameraInstance) {
+        cameraInstance.stop();
+        cameraInstance = null;
+        console.log('[DEBUG] Camera stopped');
+    }
+    if (currentVideo && currentVideo.srcObject) {
+        const stream = currentVideo.srcObject;
+        const tracks = stream.getTracks();
+        tracks.forEach(track => track.stop());
+        currentVideo.srcObject = null;
+        console.log('[DEBUG] Video stream stopped');
+    }
+    if (handsInstance) {
+        handsInstance.close();
+        handsInstance = null;
+        console.log('[DEBUG] Hands instance closed');
+    }
+    landmarkHistory = [];
+    smoothedLandmarks = [];
+    lastDetectedSign = null;
+    sePuedeDetectar = true;
+    ultimaSeña = null;
+}
+
+window.moveCarousel = moveCarousel;
+
+renderMainScreen();
+
+console.log('[DEBUG] Application initialized');
+</script>
+</body>
+</html>
