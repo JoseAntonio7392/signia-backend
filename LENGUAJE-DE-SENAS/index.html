@@ -495,19 +495,28 @@ window.onload = loadSignModel;
 
 
 
-async function detectLSMSign(landmarks, history, handedness) {
-    if (!landmarks || landmarks.length !== 21 || !history || history.length === 0) {
-        console.log('[DEBUG] Invalid data: landmarks=', landmarks ? landmarks.length : 'null', 'history=', history ? history.length : 'null');
+async function detectLSMSign(videoElement, history, handedness) {
+    if (!videoElement || !history || history.length === 0) {
+        console.log('[DEBUG] Invalid data: videoElement=', !!videoElement, 'history=', history ? history.length : 'null');
         return null;
     }
 
-    const normalizedLandmarks = normalizeLandmarks(landmarks);
-    const sequenceLength = 10; // Ajusta según el input shape del modelo
+    const sequenceLength = 10; // Usaremos los últimos 10 frames como imágenes
+    const canvas = document.createElement('canvas');
+    canvas.width = 224;
+    canvas.height = 224;
+    const ctx = canvas.getContext('2d');
 
-    // Tomar los últimos 'sequenceLength' frames de history
-    const recentHistory = history.slice(-sequenceLength).map(entry => normalizeLandmarks(entry.landmarks));
+    // Tomar los últimos 'sequenceLength' frames de history (imágenes)
+    const recentHistory = history.slice(-sequenceLength).map(entry => {
+        ctx.drawImage(videoElement, 0, 0, 224, 224); // Dibujar el frame actual
+        const imageData = ctx.getImageData(0, 0, 224, 224);
+        return imageData.data;
+    });
     while (recentHistory.length < sequenceLength) {
-        recentHistory.unshift(normalizedLandmarks); // Rellenar con el frame actual
+        ctx.drawImage(videoElement, 0, 0, 224, 224);
+        const imageData = ctx.getImageData(0, 0, 224, 224);
+        recentHistory.unshift(imageData.data);
     }
 
     if (!signModel) {
@@ -516,11 +525,11 @@ async function detectLSMSign(landmarks, history, handedness) {
     }
 
     try {
-        // Construir el array 4D manualmente
-        const inputData = [recentHistory.map(frame =>
-            frame.map(lm => [lm.x, lm.y, lm.z])
-        )];
-        const input = tf.tensor4d(inputData, [1, sequenceLength, 21, 3]);
+        // Crear tensor 4D: [1, 224, 224, 3] desde los datos de imagen
+        const input = tf.browser.fromPixels({ data: new Uint8ClampedArray(recentHistory[0]), width: 224, height: 224 }, 3)
+            .toFloat()
+            .div(255.0)
+            .expandDims(0); // Añadir dimensión de batch
         console.log('[DEBUG] Input shape:', input.shape);
 
         const prediction = signModel.predict(input);
@@ -1064,6 +1073,11 @@ async function detectLSMSign(landmarks, history, handedness) {
         minTrackingConfidence: 0.7
     });
 
+
+
+
+
+
     handsInstance.onResults(async (results) => {
     const currentTime = performance.now();
     if (currentTime - lastFrameTime < FRAME_INTERVAL) {
@@ -1091,12 +1105,13 @@ async function detectLSMSign(landmarks, history, handedness) {
                 drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, { color: '#34d399', lineWidth: 5 });
                 drawLandmarks(canvasCtx, landmarks, { color: '#a855f7', lineWidth: 2 });
 
-                landmarkHistory.push({ landmarks, handedness });
-                if (landmarkHistory.length > 30) { // Límite mayor para almacenar más frames
+                // Almacenar el frame como imagen en history
+                landmarkHistory.push({ video: video, handedness });
+                if (landmarkHistory.length > 30) {
                     landmarkHistory.shift();
                 }
 
-                const sign = await detectLSMSign(landmarks, landmarkHistory, handedness);
+                const sign = await detectLSMSign(video, landmarkHistory, handedness);
                 if (sign) {
                     detectedSign = sign;
                     debugInfo.push(`Mano ${i + 1} (${handedness.label}): ${sign}`);
@@ -1112,35 +1127,24 @@ async function detectLSMSign(landmarks, history, handedness) {
         }
     } catch (generalError) {
         console.error('[ERROR] Error general en onResults:', generalError);
-        errorMessage.textContent = 'Error en el procesamiento. Revisa la consola.';
-        errorMessage.classList.remove('hidden');
     }
 
     canvasCtx.restore();
 
     if (detectedSign && detectedSign !== lastDetectedSign) {
-        if (INAPPROPRIATE_SIGNS.includes(detectedSign)) {
-            gesture.textContent = 'Seña detectada: [Inapropiada]';
-            errorMessage.textContent = 'Se detectó una seña inapropiada. Por favor, usa señas apropiadas.';
-            errorMessage.classList.remove('hidden');
-            debugMessage.textContent = `Seña detectada: ${detectedSign} (inapropiada)`;
-            debugMessage.classList.remove('hidden');
-        } else {
-            gesture.textContent = `Seña detectada: ${detectedSign}`;
-            errorMessage.classList.add('hidden');
-            debugMessage.textContent = debugInfo.join('\n');
-            debugMessage.classList.remove('hidden');
+        gesture.textContent = `Seña detectada: ${detectedSign}`;
+        debugMessage.textContent = debugInfo.join('\n');
+        debugMessage.classList.remove('hidden');
 
-            if (selectedVoice && 'speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(detectedSign);
-                utterance.voice = selectedVoice;
-                utterance.lang = selectedVoice ? selectedVoice.lang : 'es-MX';
-                utterance.volume = 1;
-                utterance.rate = 1;
-                utterance.pitch = 1;
-                speechSynthesis.cancel();
-                speechSynthesis.speak(utterance);
-            }
+        if (selectedVoice && 'speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(detectedSign);
+            utterance.voice = selectedVoice;
+            utterance.lang = selectedVoice ? selectedVoice.lang : 'es-MX';
+            utterance.volume = 1;
+            utterance.rate = 1;
+            utterance.pitch = 1;
+            speechSynthesis.cancel();
+            speechSynthesis.speak(utterance);
         }
         lastDetectedSign = detectedSign;
     } else if (!detectedSign) {
@@ -1152,6 +1156,9 @@ async function detectLSMSign(landmarks, history, handedness) {
         console.log('[DEBUG] Frame processed:\n' + debugInfo.join('\n'));
     }
 });
+
+
+
 
     navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'user', width: 640, height: 480 }
@@ -1187,6 +1194,10 @@ async function detectLSMSign(landmarks, history, handedness) {
         status.classList.add('blink');
     });
 }
+
+
+
+
 
 function stopCamera() {
     if (cameraInstance) {
