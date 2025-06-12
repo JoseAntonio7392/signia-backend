@@ -419,18 +419,26 @@
             { name: 'Estrella', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'up', movement: null, wristY: '>0.5' }}
         ];
 
+
+
+
+
         function normalizeLandmarks(landmarks) {
     if (!landmarks || landmarks.length !== 21) {
         console.log('[DEBUG] Invalid landmarks array length:', landmarks ? landmarks.length : 'null');
-        return Array(21).fill({ x: 0, y: 0, z: 0 }); // Retorna valores por defecto si falla
+        return Array(21).fill({ x: 0, y: 0, z: 0 });
     }
     return landmarks.map(lm => ({
-        x: lm.x * 2 - 1, // De [0,1] a [-1,1]
+        x: lm.x * 2 - 1,
         y: lm.y * 2 - 1,
         z: lm.z * 2 - 1
     }));
-
 }
+
+
+
+
+
 
         function smoothLandmarks(landmarks) {
             if (smoothedLandmarks.length === 0) {
@@ -475,6 +483,18 @@ async function loadSignModel() {
 
 window.onload = loadSignModel;
 
+
+
+
+
+
+
+
+
+
+
+
+
 async function detectLSMSign(landmarks, history, handedness) {
     if (!landmarks || landmarks.length !== 21 || !history || history.length === 0) {
         console.log('[DEBUG] Invalid data: landmarks=', landmarks ? landmarks.length : 'null', 'history=', history ? history.length : 'null');
@@ -482,12 +502,12 @@ async function detectLSMSign(landmarks, history, handedness) {
     }
 
     const normalizedLandmarks = normalizeLandmarks(landmarks);
-    const sequenceLength = 10; // Número de frames que el modelo espera
+    const sequenceLength = 10; // Ajusta según el input shape del modelo
 
     // Tomar los últimos 'sequenceLength' frames de history
     const recentHistory = history.slice(-sequenceLength).map(entry => normalizeLandmarks(entry.landmarks));
     while (recentHistory.length < sequenceLength) {
-        recentHistory.unshift(normalizedLandmarks); // Rellenar con el frame actual si no hay suficiente historial
+        recentHistory.unshift(normalizedLandmarks); // Rellenar con el frame actual
     }
 
     if (!signModel) {
@@ -496,11 +516,11 @@ async function detectLSMSign(landmarks, history, handedness) {
     }
 
     try {
-        // Crear tensor 4D: [1, sequenceLength, 21, 3]
-        const input = tf.tensor4d(
-            recentHistory.map(frame => frame.map(lm => [lm.x, lm.y, lm.z])),
-            [1, sequenceLength, 21, 3]
-        );
+        // Construir el array 4D manualmente
+        const inputData = [recentHistory.map(frame =>
+            frame.map(lm => [lm.x, lm.y, lm.z])
+        )];
+        const input = tf.tensor4d(inputData, [1, sequenceLength, 21, 3]);
         console.log('[DEBUG] Input shape:', input.shape);
 
         const prediction = signModel.predict(input);
@@ -513,7 +533,7 @@ async function detectLSMSign(landmarks, history, handedness) {
         input.dispose();
         prediction.dispose();
 
-        if (predictedSign && Math.max(...scores) > 0.3) { // Umbral para pruebas
+        if (predictedSign && Math.max(...scores) > 0.3) {
             console.log(`[DEBUG] Sign detected: ${predictedSign} (confidence: ${scores[predictedIndex].toFixed(2)})`);
             return predictedSign;
         } else {
@@ -525,6 +545,10 @@ async function detectLSMSign(landmarks, history, handedness) {
         return null;
     }
 }
+
+
+
+
 
 
         function clearScreen() {
