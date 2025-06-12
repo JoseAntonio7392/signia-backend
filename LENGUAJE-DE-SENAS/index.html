@@ -1043,7 +1043,7 @@ async function detectLSMSign(landmarks, history, handedness) {
     handsInstance.onResults(async (results) => {
     const currentTime = performance.now();
     if (currentTime - lastFrameTime < FRAME_INTERVAL) {
-        return; // Throttle to maintain target FPS
+        return;
     }
     lastFrameTime = currentTime;
 
@@ -1068,22 +1068,16 @@ async function detectLSMSign(landmarks, history, handedness) {
                 drawLandmarks(canvasCtx, landmarks, { color: '#a855f7', lineWidth: 2 });
 
                 landmarkHistory.push({ landmarks, handedness });
-                if (landmarkHistory.length > HISTORY_SIZE) {
+                if (landmarkHistory.length > 30) { // Límite mayor para almacenar más frames
                     landmarkHistory.shift();
                 }
 
-                // Intentar detectar la seña con manejo de errores
-                try {
-                    const sign = await detectLSMSign(landmarks, landmarkHistory, handedness);
-                    if (sign) {
-                        detectedSign = sign;
-                        debugInfo.push(`Mano ${i + 1} (${handedness.label}): ${sign}`);
-                    } else {
-                        debugInfo.push(`Mano ${i + 1} (${handedness.label}): No detectada`);
-                    }
-                } catch (signError) {
-                    console.error('[ERROR] Error en detectLSMSign:', signError);
-                    debugInfo.push(`Mano ${i + 1} (${handedness.label}): Error en detección`);
+                const sign = await detectLSMSign(landmarks, landmarkHistory, handedness);
+                if (sign) {
+                    detectedSign = sign;
+                    debugInfo.push(`Mano ${i + 1} (${handedness.label}): ${sign}`);
+                } else {
+                    debugInfo.push(`Mano ${i + 1} (${handedness.label}): No detectada`);
                 }
             }
         } else {
@@ -1122,9 +1116,6 @@ async function detectLSMSign(landmarks, history, handedness) {
                 utterance.pitch = 1;
                 speechSynthesis.cancel();
                 speechSynthesis.speak(utterance);
-                console.log(`[DEBUG] Speaking: ${detectedSign} with voice ${selectedVoice ? selectedVoice.name : 'default'}`);
-            } else {
-                console.warn('[DEBUG] Speech synthesis not available or no voice selected');
             }
         }
         lastDetectedSign = detectedSign;
