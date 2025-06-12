@@ -457,4 +457,14 @@ function stopCamera() {
     smoothedLandmarks = [];
 }
 
+let signModel = null;
+
+async function loadSignModel() {
+    signModel = await tf.loadLayersModel('assets/signia-lsm-model/model.json');
+    console.log('[DEBUG] Modelo de LSM cargado');
+}
+
+// Llama a esta función cuando la página se cargue
+window.onload = loadSignModel;
+
 renderMainScreen();

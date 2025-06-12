@@ -1,7 +1,7 @@
   <!DOCTYPE html>
 <html lang="es">
 <head>
-  
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aprende Lengua de Señas</title>
@@ -468,141 +468,56 @@
             return distanciaEuclidiana(tip, mcp) > umbral;
         }
 
-        function detectLSMSign(landmarks, history, handedness) {
-            if (!landmarks || !history || !handedness) {
-                console.log('[DEBUG] Missing data: landmarks=', !!landmarks, 'history=', !!history, 'handedness=', !!handedness);
-                return null;
-            }
+        let signModel = null;
 
-            if (history.length > HISTORY_SIZE) history.shift();
+async function loadSignModel() {
+    signModel = await tf.loadLayersModel('assets/signia-lsm-model/model.json');
+    console.log('[DEBUG] Modelo de LSM cargado');
+}
 
-            landmarks = smoothLandmarks(landmarks);
-            const normalizedLandmarks = normalizeLandmarks(landmarks.map(lm => ({ x: 1 - lm.x, y: lm.y, z: -lm.z })));
+window.onload = loadSignModel;
 
-            const thumbTip = normalizedLandmarks[4];
-            const indexTip = normalizedLandmarks[8];
-            const middleTip = normalizedLandmarks[12];
-            const ringTip = normalizedLandmarks[16];
-            const pinkyTip = normalizedLandmarks[20];
-            const indexMCP = normalizedLandmarks[5];
-            const wrist = normalizedLandmarks[0];
-            const indexBase = normalizedLandmarks[5];
-            const pinkyBase = normalizedLandmarks[17];
+async function detectLSMSign(landmarks, history, handedness) {
+    if (!landmarks || !history || !handedness) {
+        console.log('[DEBUG] Missing data: landmarks=', !!landmarks, 'history=', !!history, 'handedness=', !!handedness);
+        return null;
+    }
 
-            const palmVector = { x: indexTip.x - wrist.x, y: indexTip.y - wrist.y, z: indexTip.z - wrist.z };
-            const palmNormal = { x: (indexBase.y - pinkyBase.y), y: -(indexBase.x - pinkyBase.x), z: 0 };
-            const magnitude = Math.sqrt(palmNormal.x ** 2 + palmNormal.y ** 2);
-            palmNormal.x /= magnitude || 1;
-            palmNormal.y /= magnitude || 1;
+    if (history.length > HISTORY_SIZE) history.shift();
 
-            const palmForward = thumbTip.z < -0.01 && indexTip.z < -0.01;
-            const palmSide = Math.abs(thumbTip.z) < 0.025 && Math.abs(indexTip.z) < 0.025;
-            const palmTowardUser = thumbTip.z > 0.01 && indexTip.z > 0.01;
-            const palmUp = palmNormal.y >= 0.3;
-            const palmDown = palmNormal.y <= -0.3;
+    landmarks = smoothLandmarks(landmarks);
+    const normalizedLandmarks = normalizeLandmarks(landmarks.map(lm => ({ x: 1 - lm.x, y: lm.y, z: -lm.z })));
 
-            const isIndexFolded = estaDedoDoblado(indexTip, indexMCP);
-            const isMiddleFolded = estaDedoDoblado(middleTip, normalizedLandmarks[9]);
-            const isRingFolded = estaDedoDoblado(ringTip, normalizedLandmarks[13]);
-            const isPinkyFolded = estaDedoDoblado(pinkyTip, normalizedLandmarks[17]);
-            const isIndexExtended = estaDedoExtendido(indexTip, indexMCP);
-            const isMiddleExtended = estaDedoExtendido(middleTip, normalizedLandmarks[9]);
-            const isRingExtended = estaDedoExtendido(ringTip, normalizedLandmarks[13]);
-            const isPinkyExtended = estaDedoExtendido(pinkyTip, normalizedLandmarks[17]);
-            const isThumbExtended = distanciaEuclidiana(thumbTip, indexMCP) > 0.06;
-            const isThumbFolded = distanciaEuclidiana(thumbTip, indexMCP) < 0.04;
+    if (!signModel) {
+        console.log('[DEBUG] Model not loaded');
+        return null;
+    }
 
-            let isMovingHorizontally = false, isMovingVertically = false, isMovingInArc = false, isMovingInTwist = false, isMovingInZigzag = false;
-            if (history.length >= HISTORY_SIZE) {
-                const recentTips = history.slice(-HISTORY_SIZE).map(h => ({ x: 1 - h.landmarks[0].x, y: h.landmarks[0].y, z: -h.landmarks[0].z }));
-                const dx = recentTips[recentTips.length - 1].x - recentTips[0].x;
-                const dy = recentTips[recentTips.length - 1].y - recentTips[0].y;
-                isMovingHorizontally = Math.abs(dx) > 0.0004 && Math.abs(dy) < 0.007;
-                isMovingVertically = Math.abs(dy) > 0.0004 && Math.abs(dx) < 0.007;
-                isMovingInArc = Math.abs(dx) > 0.0004 && Math.abs(dy) > 0.0004;
+    const input = tf.tensor2d([normalizedLandmarks.flatMap(lm => [lm.x, lm.y, lm.z])]);
+    const prediction = signModel.predict(input);
+    const scores = await prediction.data();
+    const predictedIndex = scores.indexOf(Math.max(...scores));
+    const predictedSign = SIGN_DEFINITIONS[predictedIndex]?.name || null;
 
-                const wristAngles = history.slice(-HISTORY_SIZE).map(h => {
-                    const lm = normalizeLandmarks(h.landmarks.map(lm => ({ x: 1 - lm.x, y: lm.y, z: -lm.z })));
-                    const v1 = { x: lm[5].x - lm[0].x, y: lm[5].y - lm[0].y };
-                    return Math.atan2(v1.y, v1.x);
-                });
-                const angleChange = Math.abs(wristAngles[wristAngles.length - 1] - wristAngles[0]);
-                isMovingInTwist = angleChange > 0.04;
+    input.dispose();
+    prediction.dispose();
 
-                let directionChanges = 0;
-                for (let i = 1; i < recentTips.length - 1; i++) {
-                    const dx1 = recentTips[i].x - recentTips[i - 1].x;
-                    const dx2 = recentTips[i + 1].x - recentTips[i].x;
-                    if (dx1 * dx2 < 0) directionChanges++;
-                }
-                isMovingInZigzag = directionChanges >= 1 && Math.abs(dx) > 0.0004;
-            }
+    if (INAPPROPRIATE_SIGNS.includes(predictedSign)) {
+        console.log(`[DEBUG] Inappropriate sign detected: ${predictedSign}`);
+        return null;
+    }
 
-            let bestMatch = null;
-            let bestScore = -1;
-            let debugReasons = [];
-            for (const sign of SIGN_DEFINITIONS) {
-                const { fingers, palm, movement, wristY } = sign.conditions;
-                let fingersMatch = !fingers || (
-                    (!fingers.index || (fingers.index === 'extended' ? isIndexExtended : isIndexFolded)) &&
-                    (!fingers.middle || (fingers.middle === 'extended' ? isMiddleExtended : isMiddleFolded)) &&
-                    (!fingers.ring || (fingers.ring === 'extended' ? isRingExtended : isRingFolded)) &&
-                    (!fingers.pinky || (fingers.pinky === 'extended' ? isPinkyExtended : isPinkyFolded)) &&
-                    (!fingers.thumb || (fingers.thumb === 'extended' ? isThumbExtended : isThumbFolded))
-                );
-                let palmMatch = !palm || (
-                    (palm === 'forward' && palmForward) ||
-                    (palm === 'side' && palmSide) ||
-                    (palm === 'towardUser' && palmTowardUser) ||
-                    (palm === 'up' && palmUp) ||
-                    (palm === 'down' && palmDown)
-                );
-                let movementMatch = !movement || (
-                    (movement === 'horizontal' && isMovingHorizontally) ||
-                    (movement === 'vertical' && isMovingVertically) ||
-                    (movement === 'arc' && isMovingInArc) ||
-                    (movement === 'twist' && isMovingInTwist) ||
-                    (movement === 'zigzag' && isMovingInZigzag) ||
-                    (movement === null && !isMovingHorizontally && !isMovingVertically && !isMovingInArc && !isMovingInTwist && !isMovingInZigzag)
-                );
-                let wristYMatch = !wristY || (
-                    (wristY === null || wristY === 'null') ||
-                    (wristY.startsWith('<') && wrist.y < parseFloat(wristY.slice(1))) ||
-                    (wristY.startsWith('>') && wrist.y > parseFloat(wristY.slice(1)))
-                );
-
-                if (fingersMatch && palmMatch && movementMatch && wristYMatch && sePuedeDetectar) {
-                    let score = 0;
-                    if (fingersMatch) score += 1.0;
-                    if (palmMatch) score += 0.3;
-                    if (movementMatch) score += 0.1;
-                    if (wristYMatch) score += 0.1;
-                    if (score > bestScore) {
-                        bestScore = score;
-                        bestMatch = sign.name;
-                    }
-                } else {
-                    debugReasons.push(
-                        `Sign ${sign.name} failed: ` +
-                        `fingers=${fingersMatch} (index=${isIndexExtended}/${isIndexFolded}, middle=${isMiddleExtended}/${isMiddleFolded}, ring=${isRingExtended}/${isRingFolded}, pinky=${isPinkyExtended}/${isPinkyFolded}, thumb=${isThumbExtended}/${isThumbFolded}), ` +
-                        `palm=${palmMatch} (forward=${palmForward}, side=${palmSide}, towardUser=${palmTowardUser}, up=${palmUp}, down=${palmDown}), ` +
-                        `movement=${movementMatch} (horz=${isMovingHorizontally}, vert=${isMovingVertically}, arc=${isMovingInArc}, twist=${isMovingInTwist}, zigzag=${isMovingInZigzag}), ` +
-                        `wristY=${wristYMatch} (y=${wrist.y.toFixed(2)}), canDetect=${sePuedeDetectar}`
-                    );
-                }
-            }
-
-            if (bestMatch) {
-                sePuedeDetectar = false;
-                ultimaSeña = bestMatch;
-                setTimeout(() => { sePuedeDetectar = true; }, 300);
-                console.log(`[DEBUG] Sign detected: ${bestMatch} (score: ${bestScore.toFixed(2)})`);
-                return bestMatch;
-            } else {
-                console.log('[DEBUG] No sign detected. Reasons:\n' + debugReasons.join('\n'));
-                return null;
-            }
-        }
+    if (predictedSign) {
+        sePuedeDetectar = false;
+        ultimaSeña = predictedSign;
+        setTimeout(() => { sePuedeDetectar = true; }, 300);
+        console.log(`[DEBUG] Sign detected: ${predictedSign} (confidence: ${scores[predictedIndex].toFixed(2)})`);
+        return predictedSign;
+    } else {
+        console.log('[DEBUG] No sign detected (confidence too low)');
+        return null;
+    }
+}
 
         function clearScreen() {
             app.innerHTML = '';
