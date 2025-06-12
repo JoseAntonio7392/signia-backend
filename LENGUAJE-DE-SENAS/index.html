@@ -420,19 +420,17 @@
         ];
 
         function normalizeLandmarks(landmarks) {
-            const wrist = landmarks[0];
-            const indexMCP = landmarks[5];
-            const handSize = Math.sqrt(
-                Math.pow(indexMCP.x - wrist.x, 2) +
-                Math.pow(indexMCP.y - wrist.y, 2) +
-                Math.pow(indexMCP.z - wrist.z, 2)
-            );
-            return landmarks.map(lm => ({
-                x: (lm.x - wrist.x) / (handSize || 1),
-                y: (lm.y - wrist.y) / (handSize || 1),
-                z: (lm.z - wrist.z) / (handSize || 1)
-            }));
-        }
+    if (!landmarks || landmarks.length !== 21) {
+        console.log('[DEBUG] Invalid landmarks array length:', landmarks ? landmarks.length : 'null');
+        return Array(21).fill({ x: 0, y: 0, z: 0 }); // Retorna valores por defecto si falla
+    }
+    return landmarks.map(lm => ({
+        x: lm.x * 2 - 1, // De [0,1] a [-1,1]
+        y: lm.y * 2 - 1,
+        z: lm.z * 2 - 1
+    }));
+
+}
 
         function smoothLandmarks(landmarks) {
             if (smoothedLandmarks.length === 0) {
@@ -478,46 +476,56 @@ async function loadSignModel() {
 window.onload = loadSignModel;
 
 async function detectLSMSign(landmarks, history, handedness) {
-    if (!landmarks || !history || !handedness) {
-        console.log('[DEBUG] Missing data: landmarks=', !!landmarks, 'history=', !!history, 'handedness=', !!handedness);
+    if (!landmarks || landmarks.length !== 21 || !history || history.length === 0) {
+        console.log('[DEBUG] Invalid data: landmarks=', landmarks ? landmarks.length : 'null', 'history=', history ? history.length : 'null');
         return null;
     }
 
-    if (history.length > HISTORY_SIZE) history.shift();
+    const normalizedLandmarks = normalizeLandmarks(landmarks);
+    const sequenceLength = 10; // Número de frames que el modelo espera
 
-    landmarks = smoothLandmarks(landmarks);
-    const normalizedLandmarks = normalizeLandmarks(landmarks.map(lm => ({ x: 1 - lm.x, y: lm.y, z: -lm.z })));
+    // Tomar los últimos 'sequenceLength' frames de history
+    const recentHistory = history.slice(-sequenceLength).map(entry => normalizeLandmarks(entry.landmarks));
+    while (recentHistory.length < sequenceLength) {
+        recentHistory.unshift(normalizedLandmarks); // Rellenar con el frame actual si no hay suficiente historial
+    }
 
     if (!signModel) {
         console.log('[DEBUG] Model not loaded');
         return null;
     }
 
-    const input = tf.tensor2d([normalizedLandmarks.flatMap(lm => [lm.x, lm.y, lm.z])]);
-    const prediction = signModel.predict(input);
-    const scores = await prediction.data();
-    const predictedIndex = scores.indexOf(Math.max(...scores));
-    const predictedSign = SIGN_DEFINITIONS[predictedIndex]?.name || null;
+    try {
+        // Crear tensor 4D: [1, sequenceLength, 21, 3]
+        const input = tf.tensor4d(
+            recentHistory.map(frame => frame.map(lm => [lm.x, lm.y, lm.z])),
+            [1, sequenceLength, 21, 3]
+        );
+        console.log('[DEBUG] Input shape:', input.shape);
 
-    input.dispose();
-    prediction.dispose();
+        const prediction = signModel.predict(input);
+        const scores = await prediction.data();
+        console.log('[DEBUG] Prediction scores:', scores);
 
-    if (INAPPROPRIATE_SIGNS.includes(predictedSign)) {
-        console.log(`[DEBUG] Inappropriate sign detected: ${predictedSign}`);
-        return null;
-    }
+        const predictedIndex = scores.indexOf(Math.max(...scores));
+        const predictedSign = SIGN_DEFINITIONS[predictedIndex]?.name || null;
 
-    if (predictedSign) {
-        sePuedeDetectar = false;
-        ultimaSeña = predictedSign;
-        setTimeout(() => { sePuedeDetectar = true; }, 300);
-        console.log(`[DEBUG] Sign detected: ${predictedSign} (confidence: ${scores[predictedIndex].toFixed(2)})`);
-        return predictedSign;
-    } else {
-        console.log('[DEBUG] No sign detected (confidence too low)');
+        input.dispose();
+        prediction.dispose();
+
+        if (predictedSign && Math.max(...scores) > 0.3) { // Umbral para pruebas
+            console.log(`[DEBUG] Sign detected: ${predictedSign} (confidence: ${scores[predictedIndex].toFixed(2)})`);
+            return predictedSign;
+        } else {
+            console.log('[DEBUG] No sign detected (confidence too low)');
+            return null;
+        }
+    } catch (error) {
+        console.error('[ERROR] Error en predict:', error);
         return null;
     }
 }
+
 
         function clearScreen() {
             app.innerHTML = '';
@@ -999,60 +1007,55 @@ async function detectLSMSign(landmarks, history, handedness) {
 
         function startCamera() {
             if (cameraInstance) {
-                console.log('[DEBUG] Camera already running');
-                return;
-            }
+        console.log('[DEBUG] Camera already running');
+        return;
+    }
 
-            const video = document.getElementById('video');
-            const canvas = document.getElementById('canvas');
-            const status = document.getElementById('status');
-            const gesture = document.getElementById('gesture');
-            const errorMessage = document.getElementById('errorMessage');
-            const debugMessage = document.getElementById('debugMessage');
-            const videoContainer = document.getElementById('videoContainer');
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const status = document.getElementById('status');
+    const gesture = document.getElementById('gesture');
+    const errorMessage = document.getElementById('errorMessage');
+    const debugMessage = document.getElementById('debugMessage');
+    const videoContainer = document.getElementById('videoContainer');
 
-            if (!video || !canvas || !status || !gesture || !errorMessage || !debugMessage || !videoContainer) {
-                console.error('[ERROR] Missing DOM elements for camera');
-                errorMessage.textContent = 'Error: Elementos de la interfaz no encontrados.';
-                errorMessage.classList.remove('hidden');
-                return;
-            }
+    if (!video || !canvas || !status || !gesture || !errorMessage || !debugMessage || !videoContainer) {
+        console.error('[ERROR] Missing DOM elements for camera');
+        errorMessage.textContent = 'Error: Elementos de la interfaz no encontrados.';
+        errorMessage.classList.remove('hidden');
+        return;
+    }
 
-            currentVideo = video;
-            const canvasCtx = canvas.getContext('2d');
+    currentVideo = video;
+    const canvasCtx = canvas.getContext('2d');
 
-            handsInstance = new Hands({
-                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1646424915/${file}`
-            });
+    handsInstance = new Hands({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1646424915/${file}`
+    });
 
-            handsInstance.setOptions({
-                maxNumHands: 2,
-                modelComplexity: 1,
-                minDetectionConfidence: 0.7,
-                minTrackingConfidence: 0.7
-            });
-
-            handsInstance.setOptions({
+    handsInstance.setOptions({
         maxNumHands: 2,
         modelComplexity: 1,
         minDetectionConfidence: 0.7,
         minTrackingConfidence: 0.7
     });
 
-    handsInstance.onResults((results) => {
-        const currentTime = performance.now();
-        if (currentTime - lastFrameTime < FRAME_INTERVAL) {
-            return; // Throttle to maintain target FPS
-        }
-        lastFrameTime = currentTime;
+    handsInstance.onResults(async (results) => {
+    const currentTime = performance.now();
+    if (currentTime - lastFrameTime < FRAME_INTERVAL) {
+        return; // Throttle to maintain target FPS
+    }
+    lastFrameTime = currentTime;
 
-        canvasCtx.save();
-        canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-        canvasCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const canvasCtx = canvas.getContext('2d');
+    canvasCtx.save();
+    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+    canvasCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        let detectedSign = null;
-        let debugInfo = [];
+    let detectedSign = null;
+    let debugInfo = [];
 
+    try {
         if (results.multiHandLandmarks && results.multiHandedness) {
             videoContainer.classList.add('hands-detected');
             status.textContent = 'Manos detectadas';
@@ -1069,12 +1072,18 @@ async function detectLSMSign(landmarks, history, handedness) {
                     landmarkHistory.shift();
                 }
 
-                const sign = detectLSMSign(landmarks, landmarkHistory, handedness);
-                if (sign) {
-                    detectedSign = sign;
-                    debugInfo.push(`Mano ${i + 1} (${handedness.label}): ${sign}`);
-                } else {
-                    debugInfo.push(`Mano ${i + 1} (${handedness.label}): No detectada`);
+                // Intentar detectar la seña con manejo de errores
+                try {
+                    const sign = await detectLSMSign(landmarks, landmarkHistory, handedness);
+                    if (sign) {
+                        detectedSign = sign;
+                        debugInfo.push(`Mano ${i + 1} (${handedness.label}): ${sign}`);
+                    } else {
+                        debugInfo.push(`Mano ${i + 1} (${handedness.label}): No detectada`);
+                    }
+                } catch (signError) {
+                    console.error('[ERROR] Error en detectLSMSign:', signError);
+                    debugInfo.push(`Mano ${i + 1} (${handedness.label}): Error en detección`);
                 }
             }
         } else {
@@ -1083,45 +1092,51 @@ async function detectLSMSign(landmarks, history, handedness) {
             status.classList.add('blink');
             debugInfo.push('No se detectaron manos');
         }
+    } catch (generalError) {
+        console.error('[ERROR] Error general en onResults:', generalError);
+        errorMessage.textContent = 'Error en el procesamiento. Revisa la consola.';
+        errorMessage.classList.remove('hidden');
+    }
 
-        canvasCtx.restore();
+    canvasCtx.restore();
 
-        if (detectedSign && detectedSign !== lastDetectedSign) {
-            if (INAPPROPRIATE_SIGNS.includes(detectedSign)) {
-                gesture.textContent = 'Seña detectada: [Inapropiada]';
-                errorMessage.textContent = 'Se detectó una seña inapropiada. Por favor, usa señas apropiadas.';
-                errorMessage.classList.remove('hidden');
-                debugMessage.textContent = `Seña detectada: ${detectedSign} (inapropiada)`;
-                debugMessage.classList.remove('hidden');
+    if (detectedSign && detectedSign !== lastDetectedSign) {
+        if (INAPPROPRIATE_SIGNS.includes(detectedSign)) {
+            gesture.textContent = 'Seña detectada: [Inapropiada]';
+            errorMessage.textContent = 'Se detectó una seña inapropiada. Por favor, usa señas apropiadas.';
+            errorMessage.classList.remove('hidden');
+            debugMessage.textContent = `Seña detectada: ${detectedSign} (inapropiada)`;
+            debugMessage.classList.remove('hidden');
+        } else {
+            gesture.textContent = `Seña detectada: ${detectedSign}`;
+            errorMessage.classList.add('hidden');
+            debugMessage.textContent = debugInfo.join('\n');
+            debugMessage.classList.remove('hidden');
+
+            if (selectedVoice && 'speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(detectedSign);
+                utterance.voice = selectedVoice;
+                utterance.lang = selectedVoice ? selectedVoice.lang : 'es-MX';
+                utterance.volume = 1;
+                utterance.rate = 1;
+                utterance.pitch = 1;
+                speechSynthesis.cancel();
+                speechSynthesis.speak(utterance);
+                console.log(`[DEBUG] Speaking: ${detectedSign} with voice ${selectedVoice ? selectedVoice.name : 'default'}`);
             } else {
-                gesture.textContent = `Seña detectada: ${detectedSign}`;
-                errorMessage.classList.add('hidden');
-                debugMessage.textContent = debugInfo.join('\n');
-                debugMessage.classList.remove('hidden');
-
-                if (selectedVoice && 'speechSynthesis' in window) {
-                    const utterance = new SpeechSynthesisUtterance(detectedSign);
-                    utterance.voice = selectedVoice;
-                    utterance.lang = selectedVoice ? selectedVoice.lang : 'es-MX';
-                    utterance.rate = 1.0;
-                    utterance.pitch = 1.0;
-                    speechSynthesis.cancel();
-                    speechSynthesis.speak(utterance);
-                    console.log(`[DEBUG] Speaking: ${detectedSign} with voice ${selectedVoice ? selectedVoice.name : 'default'}`);
-                } else {
-                    console.warn('[DEBUG] Speech synthesis not available or no voice selected');
-                }
+                console.warn('[DEBUG] Speech synthesis not available or no voice selected');
             }
-            lastDetectedSign = detectedSign;
-        } else if (!detectedSign) {
-            gesture.textContent = 'Seña detectada: Ninguna';
-            lastDetectedSign = null;
         }
+        lastDetectedSign = detectedSign;
+    } else if (!detectedSign) {
+        gesture.textContent = 'Seña detectada: Ninguna';
+        lastDetectedSign = null;
+    }
 
-        if (debugInfo.length > 0) {
-            console.log('[DEBUG] Frame processed:\n' + debugInfo.join('\n'));
-        }
-    });
+    if (debugInfo.length > 0) {
+        console.log('[DEBUG] Frame processed:\n' + debugInfo.join('\n'));
+    }
+});
 
     navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'user', width: 640, height: 480 }
@@ -1191,3 +1206,6 @@ console.log('[DEBUG] Application initialized');
 </script>
 </body>
 </html>
+
+
+handsInstance
