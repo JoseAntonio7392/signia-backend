@@ -495,29 +495,20 @@ window.onload = loadSignModel;
 
 
 
-async function detectLSMSign(videoElement, history, handedness) {
-    if (!videoElement || !history || history.length === 0) {
-        console.log('[DEBUG] Invalid data: videoElement=', !!videoElement, 'history=', history ? history.length : 'null');
+async function detectLSMSign(videoElement) {
+    if (!videoElement) {
+        console.log('[DEBUG] Invalid videoElement');
         return null;
     }
 
-    const sequenceLength = 10; // Usaremos los últimos 10 frames como imágenes
     const canvas = document.createElement('canvas');
     canvas.width = 224;
     canvas.height = 224;
     const ctx = canvas.getContext('2d');
 
-    // Tomar los últimos 'sequenceLength' frames de history (imágenes)
-    const recentHistory = history.slice(-sequenceLength).map(entry => {
-        ctx.drawImage(videoElement, 0, 0, 224, 224); // Dibujar el frame actual
-        const imageData = ctx.getImageData(0, 0, 224, 224);
-        return imageData.data;
-    });
-    while (recentHistory.length < sequenceLength) {
-        ctx.drawImage(videoElement, 0, 0, 224, 224);
-        const imageData = ctx.getImageData(0, 0, 224, 224);
-        recentHistory.unshift(imageData.data);
-    }
+    // Dibujar el frame actual del video en el canvas
+    ctx.drawImage(videoElement, 0, 0, 224, 224);
+    const imageData = ctx.getImageData(0, 0, 224, 224);
 
     if (!signModel) {
         console.log('[DEBUG] Model not loaded');
@@ -525,10 +516,11 @@ async function detectLSMSign(videoElement, history, handedness) {
     }
 
     try {
-        // Crear tensor 4D: [1, 224, 224, 3] desde los datos de imagen
-        const input = tf.browser.fromPixels({ data: new Uint8ClampedArray(recentHistory[0]), width: 224, height: 224 }, 3)
+        // Convertir la imagen a tensor 4D
+        const input = tf.browser.fromPixels(imageData)
             .toFloat()
             .div(255.0)
+            .resizeBilinear([224, 224]) // Asegurar tamaño exacto
             .expandDims(0); // Añadir dimensión de batch
         console.log('[DEBUG] Input shape:', input.shape);
 
@@ -1105,13 +1097,7 @@ async function detectLSMSign(videoElement, history, handedness) {
                 drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, { color: '#34d399', lineWidth: 5 });
                 drawLandmarks(canvasCtx, landmarks, { color: '#a855f7', lineWidth: 2 });
 
-                // Almacenar el frame como imagen en history
-                landmarkHistory.push({ video: video, handedness });
-                if (landmarkHistory.length > 30) {
-                    landmarkHistory.shift();
-                }
-
-                const sign = await detectLSMSign(video, landmarkHistory, handedness);
+                const sign = await detectLSMSign(video);
                 if (sign) {
                     detectedSign = sign;
                     debugInfo.push(`Mano ${i + 1} (${handedness.label}): ${sign}`);
@@ -1156,6 +1142,8 @@ async function detectLSMSign(videoElement, history, handedness) {
         console.log('[DEBUG] Frame processed:\n' + debugInfo.join('\n'));
     }
 });
+
+
 
 
 
