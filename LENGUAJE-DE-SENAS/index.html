@@ -753,22 +753,42 @@ async function detectLSMSign(videoElement) {
             console.log('[DEBUG] Categories loaded: ' + type);
         }
 
+        
+
         function showVideos(folder) {
-            const contentContainer = document.getElementById('contentContainer');
-            contentContainer.innerHTML = `
-                <h3 class="text-2xl font-semibold mb-4">${folder.charAt(0).toUpperCase() + folder.slice(1)}</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="card p-4 text-center">
-                        <video controls preload="metadata" class="w-full max-w-md rounded-lg">
-                            <source src="assets/videos/${folder}/Video1.mp4" type="video/mp4, ">
-                            Tu navegador no soporta el elemento de video.
-                        </video>
-                        <p class="mt-2">Vídeo: Lengua de Señas - ${folder}</p>
-                    </div>
+    const contentContainer = document.getElementById('contentContainer');
+    const videoFiles = [
+        { name: 'Video 1', path: `assets/videos/${folder}/Video1.mp4` },
+        { name: 'Video 2', path: `assets/videos/${folder}/Video2.mp4` },
+        { name: 'Video 3', path: `assets/videos/${folder}/Video3.mp4` },
+        { name: 'Video 4', path: `assets/videos/${folder}/Video4.mp4` }
+    ];
+
+    contentContainer.innerHTML = `
+        <h3 class="text-2xl font-semibold mb-4">${folder.charAt(0).toUpperCase() + folder.slice(1)}</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            ${videoFiles.map(video => `
+                <div class="card p-4 text-center">
+                    <video controls preload="metadata" class="w-full max-w-md rounded-lg">
+                        <source src="${video.path}" type="video/mp4">
+                        Tu navegador no soporta el elemento de video.
+                    </video>
+                    <p class="mt-2">Vídeo: ${video.name} - ${folder}</p>
                 </div>
-            `;
-            console.log('[DEBUG] Vídeos loaded for: ' + folder);
-        }
+            `).join('')}
+        </div>
+    `;
+
+    contentContainer.querySelectorAll('video').forEach(video => {
+        video.onloadeddata = () => console.log('[DEBUG] Video loaded: ' + video.querySelector('source').src);
+        video.onerror = () => {
+            console.error('[ERROR] Video failed to load: ' + video.querySelector('source').src);
+            video.parentElement.innerHTML += '<div class="error-message">No se pudo cargar el video.</div>';
+        };
+    });
+
+    console.log('[DEBUG] Videos loaded for: ' + folder);
+}
 
         function showImages(folder) {
             const contentContainer = document.getElementById('contentContainer');
