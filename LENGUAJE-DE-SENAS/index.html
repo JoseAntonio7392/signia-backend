@@ -324,50 +324,27 @@
 
 
 
+
         const SIGN_DEFINITIONS = [
-    // Abecedario (26 letras: A-Z)
-        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", 
-        "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
-    
-     // Casa (34 objetos)
-        "almohada", "azotea", "azúcarera", "baño", "barrer", "batidora", "bote", "buzón", 
-        "cacerola", "cajón", "cama", "candelero", "casa", "cazuela", "cepillo de dientes", 
-        "cepillo de pelo", "champú", "charola", "chupón", "cobertor", "coladera", "colcha", 
-        "colador", "comal", "comedor", "cómoda", "condominio", "copa", "corredor", "corriente", 
-        "cortina", "cuarto", "cuchara", "cuchillo", "departamento", "destapador",
-    
-    // Escuela (33 términos)
-        "antropología", "bandera", "calificación", "campana", "certificado", "compás", 
-        "computación", "cuaderno", "dibujo", "diccionario", "escala", "escuadra", "escuela", 
-        "estudiante", "goma", "lápiz", "lección", "mapa", "microscopio", "papel", "párrafo", 
-        "perspectiva", "pizarrón", "pluma", "politécnico", "premio", "preparatoria", "primaria", 
-        "prueba", "química", "sacapuntas", "secundaria", "tecnológico",
-    
-    // Meses (12 meses)
-        "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", 
-        "septiembre", "octubre", "noviembre", "diciembre",
-    
-    // Colores (7 colores)
-        "naranja", "rojo", "verde", "rosa", "blanco", "negro", "café",
-    
-    // Estaciones (4 estaciones)
-        "primavera", "verano", "otoño", "invierno",
-    
-    // Días de la semana (7 días)
-        "lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo",
-    
-    // Animales (15 animales)
-        "vaca", "lobo", "jirafa", "tiburón", "perro", "gato", "puerco", "rinoceronte", 
-        "serpiente", "tigre", "toro", "libélula", "lagarto", "gorila", "foca",
-    
-    // Groserías (9 términos)
-        "Grosería (Tonto)", "Grosería (Wey)", "Grosería (Idiota)", "Grosería (Puto)", 
-        "Grosería (Mierda)", "Grosería (Zorra)", "Grosería (Pendejo)", "Grosería (Verga)",
-    
-    
+    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
+    "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+    "almohada", "azotea", "azúcarera", "baño", "barrer", "batidora", "bote", "buzón",
+    "cacerola", "cajón", "cama", "candelero", "casa", "cazuela", "cepillo de dientes",
+    "cepillo de pelo", "champú", "charola", "chupón", "cobertor",
+    "antropología", "bandera", "calificación", "campana", "certificado", "compás",
+    "computación", "cuaderno", "dibujo", "diccionario", "escala", "escuadra", "escuela",
+    "estudiante", "goma", "lápiz", "lección", "mapa", "microscopio", "papel",
+    "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",
+    "septiembre", "octubre", "noviembre", "diciembre",
+    "naranja", "rojo", "verde", "rosa", "blanco", "negro", "café",
+    "primavera", "verano", "otoño", "invierno",
+    "lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo",
+    "vaca", "lobo", "jirafa", "tiburón", "perro", "gato", "puerco", "rinoceronte",
+    "serpiente", "tigre",
+    "Grosería (Tonto)", "Grosería (Wey)", "Grosería (Idiota)", "Grosería (Puto)",
+    "Grosería (Mierda)", "Grosería (Zorra)", "Grosería (Pendejo)", "Grosería (Verga)"
     
 ];
-
 
 
 
@@ -480,18 +457,20 @@
     }
 
     async function predict() {
-        const currentTime = performance.now();
-        if (currentTime - lastPredictionTime < PREDICTION_INTERVAL) {
-            return;
-        }
+    const currentTime = performance.now();
+    if (currentTime - lastPredictionTime < PREDICTION_INTERVAL) {
+        return;
+    }
 
+        await webcam.update(); 
+    
         const prediction = await model.predict(webcam.canvas);
         for (let i = 0; i < maxPredictions; i++) {
             const classPrediction = prediction[i];
             const predictedSign = SIGN_DEFINITIONS[i] || `Desconocida (índice ${i})`;
             console.log(`[DEBUG] Class ${i}: ${predictedSign}, Probability: ${classPrediction.probability.toFixed(2)}`);
 
-            if (classPrediction.probability > 0.4) {
+            if (classPrediction.probability > 0.2) {
                 if (predictedSign !== lastDetectedSign) {
                     console.log(`[DEBUG] Sign detected: ${predictedSign} (confidence: ${classPrediction.probability.toFixed(2)})`);
                     gesture.textContent = `Seña detectada: ${predictedSign}`;
