@@ -326,43 +326,43 @@
 
         const SIGN_DEFINITIONS = [
     // Abecedario (26 letras: A-Z)
-    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", 
-    "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", 
+        "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
     
-    // Casa (34 objetos)
-    "almohada", "azotea", "azúcarera", "baño", "barrer", "batidora", "bote", "buzón", 
-    "cacerola", "cajón", "cama", "candelero", "casa", "cazuela", "cepillo de dientes", 
-    "cepillo de pelo", "champú", "charola", "chupón", "cobertor", "coladera", "colcha", 
-    "colador", "comal", "comedor", "cómoda", "condominio", "copa", "corredor", "corriente", 
-    "cortina", "cuarto", "cuchara", "cuchillo", "departamento", "destapador",
+     // Casa (34 objetos)
+        "almohada", "azotea", "azúcarera", "baño", "barrer", "batidora", "bote", "buzón", 
+        "cacerola", "cajón", "cama", "candelero", "casa", "cazuela", "cepillo de dientes", 
+        "cepillo de pelo", "champú", "charola", "chupón", "cobertor", "coladera", "colcha", 
+        "colador", "comal", "comedor", "cómoda", "condominio", "copa", "corredor", "corriente", 
+        "cortina", "cuarto", "cuchara", "cuchillo", "departamento", "destapador",
     
     // Escuela (33 términos)
-    "antropología", "bandera", "calificación", "campana", "certificado", "compás", 
-    "computación", "cuaderno", "dibujo", "diccionario", "escala", "escuadra", "escuela", 
-    "estudiante", "goma", "lápiz", "lección", "mapa", "microscopio", "papel", "párrafo", 
-    "perspectiva", "pizarrón", "pluma", "politécnico", "premio", "preparatoria", "primaria", 
-    "prueba", "química", "sacapuntas", "secundaria", "tecnológico",
+        "antropología", "bandera", "calificación", "campana", "certificado", "compás", 
+        "computación", "cuaderno", "dibujo", "diccionario", "escala", "escuadra", "escuela", 
+        "estudiante", "goma", "lápiz", "lección", "mapa", "microscopio", "papel", "párrafo", 
+        "perspectiva", "pizarrón", "pluma", "politécnico", "premio", "preparatoria", "primaria", 
+        "prueba", "química", "sacapuntas", "secundaria", "tecnológico",
     
     // Meses (12 meses)
-    "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", 
-    "septiembre", "octubre", "noviembre", "diciembre",
+        "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", 
+        "septiembre", "octubre", "noviembre", "diciembre",
     
     // Colores (7 colores)
-    "naranja", "rojo", "verde", "rosa", "blanco", "negro", "café",
+        "naranja", "rojo", "verde", "rosa", "blanco", "negro", "café",
     
     // Estaciones (4 estaciones)
-    "primavera", "verano", "otoño", "invierno",
+        "primavera", "verano", "otoño", "invierno",
     
     // Días de la semana (7 días)
-    "lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo",
+        "lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo",
     
     // Animales (15 animales)
-    "vaca", "lobo", "jirafa", "tiburón", "perro", "gato", "puerco", "rinoceronte", 
-    "serpiente", "tigre", "toro", "libélula", "lagarto", "gorila", "foca",
+        "vaca", "lobo", "jirafa", "tiburón", "perro", "gato", "puerco", "rinoceronte", 
+        "serpiente", "tigre", "toro", "libélula", "lagarto", "gorila", "foca",
     
     // Groserías (9 términos)
-    "Grosería (Tonto)", "Grosería (Wey)", "Grosería (Idiota)", "Grosería (Puto)", 
-    "Grosería (Mierda)", "Grosería (Zorra)", "Grosería (Pendejo)", "Grosería (Verga)",
+        "Grosería (Tonto)", "Grosería (Wey)", "Grosería (Idiota)", "Grosería (Puto)", 
+        "Grosería (Mierda)", "Grosería (Zorra)", "Grosería (Pendejo)", "Grosería (Verga)",
     
     
     
@@ -422,6 +422,10 @@
             return distanciaEuclidiana(tip, mcp) > umbral;
         }
 
+
+
+
+
         let signModel = null;
 
 async function loadSignModel() {
@@ -430,18 +434,6 @@ async function loadSignModel() {
 }
 
 window.onload = loadSignModel;
-
-
-
-
-
-
-
-
-
-
-
-
 
 async function detectLSMSign(videoElement) {
     if (!videoElement) {
