@@ -426,67 +426,189 @@
 
 
 
-        let signModel = null;
-
-async function loadSignModel() {
-    signModel = await tf.loadLayersModel('assets/signia-lsm-model/model.json');
-    console.log('[DEBUG] Modelo de LSM cargado');
-}
-
-window.onload = loadSignModel;
-
-async function detectLSMSign(videoElement) {
-    if (!videoElement) {
-        console.log('[DEBUG] Invalid videoElement');
-        return null;
+       function startCamera() {
+    if (cameraInstance) {
+        console.log('[DEBUG] Camera already running');
+        return;
     }
 
-    const canvas = document.createElement('canvas');
-    canvas.width = 224;
-    canvas.height = 224;
-    const ctx = canvas.getContext('2d');
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const status = document.getElementById('status');
+    const gesture = document.getElementById('gesture');
+    const errorMessage = document.getElementById('errorMessage');
+    const debugMessage = document.getElementById('debugMessage');
+    const videoContainer = document.getElementById('videoContainer');
 
-    // Dibujar el frame actual del video en el canvas
-    ctx.drawImage(videoElement, 0, 0, 224, 224);
-    const imageData = ctx.getImageData(0, 0, 224, 224);
-
-    if (!signModel) {
-        console.log('[DEBUG] Model not loaded');
-        return null;
+    if (!video || !canvas || !status || !gesture || !errorMessage || !debugMessage || !videoContainer) {
+        console.error('[ERROR] Missing DOM elements for camera');
+        errorMessage.textContent = 'Error: Elementos de la interfaz no encontrados.';
+        errorMessage.classList.remove('hidden');
+        return;
     }
 
-    try {
-        // Convertir la imagen a tensor 4D
-        const input = tf.browser.fromPixels(imageData)
-            .toFloat()
-            .div(255.0)
-            .resizeBilinear([224, 224]) // Asegurar tamaño exacto
-            .expandDims(0); // Añadir dimensión de batch
-        console.log('[DEBUG] Input shape:', input.shape);
+    currentVideo = video;
+    const canvasCtx = canvas.getContext('2d');
 
-        const prediction = signModel.predict(input);
-        const scores = await prediction.data();
-        console.log('[DEBUG] Prediction scores:', scores);
+    handsInstance = new Hands({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1646424915/${file}`
+    });
 
-        const predictedIndex = scores.indexOf(Math.max(...scores));
-        const predictedSign = SIGN_DEFINITIONS[predictedIndex]?.name || null;
+    handsInstance.setOptions({
+        maxNumHands: 2,
+        modelComplexity: 1,
+        minDetectionConfidence: 0.7,
+        minTrackingConfidence: 0.7
+    });
 
-        input.dispose();
-        prediction.dispose();
+    // Nueva inicialización del modelo y webcam
+    let model, webcam, maxPredictions, lastPredictionTime = 0;
+    const PREDICTION_INTERVAL = 1000; // 1 fps
+    const URL = "./my_model/"; // Asegúrate de que esta ruta sea correcta
 
-        if (predictedSign && Math.max(...scores) > 0.3) {
-            console.log(`[DEBUG] Sign detected: ${predictedSign} (confidence: ${scores[predictedIndex].toFixed(2)})`);
-            return predictedSign;
-        } else {
-            console.log('[DEBUG] No sign detected (confidence too low)');
-            return null;
+    async function init() {
+        const modelURL = URL + "model.json";
+        const metadataURL = URL + "metadata.json";
+        model = await tmImage.load(modelURL, metadataURL);
+        maxPredictions = model.getTotalClasses();
+        console.log('[DEBUG] Model loaded with', maxPredictions, 'classes');
+
+        webcam = new tmImage.Webcam(224, 224, true);
+        await webcam.setup();
+        await webcam.play();
+        await webcam.update(); // Asegura que el primer frame esté listo
+    }
+
+    async function predict() {
+        const currentTime = performance.now();
+        if (currentTime - lastPredictionTime < PREDICTION_INTERVAL) {
+            return;
         }
-    } catch (error) {
-        console.error('[ERROR] Error en predict:', error);
-        return null;
-    }
-}
 
+        const prediction = await model.predict(webcam.canvas);
+        for (let i = 0; i < maxPredictions; i++) {
+            const classPrediction = prediction[i];
+            const predictedSign = SIGN_DEFINITIONS[i] || `Desconocida (índice ${i})`;
+            console.log(`[DEBUG] Class ${i}: ${predictedSign}, Probability: ${classPrediction.probability.toFixed(2)}`);
+
+            if (classPrediction.probability > 0.4) {
+                if (predictedSign !== lastDetectedSign) {
+                    console.log(`[DEBUG] Sign detected: ${predictedSign} (confidence: ${classPrediction.probability.toFixed(2)})`);
+                    gesture.textContent = `Seña detectada: ${predictedSign}`;
+                    if (selectedVoice && 'speechSynthesis' in window) {
+                        const utterance = new SpeechSynthesisUtterance(predictedSign);
+                        utterance.voice = selectedVoice;
+                        utterance.lang = selectedVoice ? selectedVoice.lang : 'es-MX';
+                        utterance.volume = 1;
+                        utterance.rate = 1;
+                        utterance.pitch = 1;
+                        speechSynthesis.cancel();
+                        speechSynthesis.speak(utterance);
+                    }
+                    lastDetectedSign = predictedSign; // Usamos la variable global de tu código
+                }
+                lastPredictionTime = currentTime;
+                return;
+            }
+        }
+        if (lastDetectedSign) {
+            gesture.textContent = 'Seña detectada: Ninguna';
+            lastDetectedSign = null;
+        }
+    }
+
+    handsInstance.onResults(async (results) => {
+        const currentTime = performance.now();
+        if (currentTime - lastFrameTime < FRAME_INTERVAL) {
+            return;
+        }
+        lastFrameTime = currentTime;
+
+        const canvasCtx = canvas.getContext('2d');
+        canvasCtx.save();
+        canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+        canvasCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        let debugInfo = [];
+
+        try {
+            if (results.multiHandLandmarks && results.multiHandedness) {
+                videoContainer.classList.add('hands-detected');
+                status.textContent = 'Manos detectadas';
+                status.classList.remove('blink');
+
+                for (let i = 0; i < results.multiHandLandmarks.length; i++) {
+                    const landmarks = results.multiHandLandmarks[i];
+                    const handedness = results.multiHandedness[i];
+                    drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, { color: '#34d399', lineWidth: 5 });
+                    drawLandmarks(canvasCtx, landmarks, { color: '#a855f7', lineWidth: 2 });
+
+                    if (!model) await init();
+                    await predict();
+                    const predictedSign = gesture.textContent.replace('Seña detectada: ', '');
+                    if (predictedSign !== 'Ninguna') {
+                        debugInfo.push(`Mano ${i + 1} (${handedness.label}): ${predictedSign}`);
+                    } else {
+                        debugInfo.push(`Mano ${i + 1} (${handedness.label}): No detectada`);
+                    }
+                }
+            } else {
+                videoContainer.classList.remove('hands-detected');
+                status.textContent = 'No se detectan manos';
+                status.classList.add('blink');
+                debugInfo.push('No se detectaron manos');
+            }
+        } catch (generalError) {
+            console.error('[ERROR] Error general en onResults:', generalError);
+        }
+
+        canvasCtx.restore();
+
+        if (debugInfo.length > 0) {
+            debugMessage.textContent = debugInfo.join('\n');
+            debugMessage.classList.remove('hidden');
+        } else {
+            debugMessage.classList.add('hidden');
+        }
+
+        console.log('[DEBUG] Frame processed:\n' + debugInfo.join('\n'));
+    });
+
+    // Continúa con el resto de startCamera
+    navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: 640, height: 480 }
+    }).then(stream => {
+        video.srcObject = stream;
+        video.play().catch(err => {
+            console.error('[ERROR] Failed to play video:', err);
+            errorMessage.textContent = 'Error al reproducir el video. Verifica los permisos de la cámara.';
+            errorMessage.classList.remove('hidden');
+            status.textContent = 'Error en la cámara';
+            status.classList.add('blink');
+        });
+
+        video.onloadedmetadata = () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            cameraInstance = new Camera(video, {
+                onFrame: async () => {
+                    await handsInstance.send({ image: video });
+                },
+                width: video.videoWidth,
+                height: video.videoHeight
+            });
+            cameraInstance.start();
+            status.textContent = 'Cámara iniciada';
+            console.log('[DEBUG] Camera started with resolution ' + video.videoWidth + 'x' + video.videoHeight);
+        };
+    }).catch(err => {
+        console.error('[ERROR] Camera access denied:', err);
+        errorMessage.textContent = 'No se pudo acceder a la cámara. Por favor, permite el acceso.';
+        errorMessage.classList.remove('hidden');
+        status.textContent = 'Error: Cámara no disponible';
+        status.classList.add('blink');
+    });
+}
 
 
 
