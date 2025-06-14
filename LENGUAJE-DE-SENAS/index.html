@@ -317,108 +317,56 @@
         let sePuedeDetectar = true;
         let ultimaSeña = null;
 
-        const SIGN_DEFINITIONS = [
-            { name: 'Hola', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: 'horizontal', wristY: null }},
-            { name: 'Adiós', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: 'horizontal', wristY: '>0.2' }},
-            { name: 'Nosotros', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: 'arc', wristY: null }},
-            { name: 'Cómo estás', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: 'arc', wristY: null }},
-            { name: 'Hasta luego', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: 'horizontal', wristY: null }},
-            { name: 'Buenos días', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: 'vertical', wristY: null }},
-            { name: 'Buenas noches', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: 'vertical', wristY: null }},
-            { name: 'Gracias', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: 'vertical', wristY: null }},
-            { name: 'Por favor', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: 'arc', wristY: null }},
-            { name: 'Perdón', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'forward', movement: 'vertical', wristY: '<0.4' }},
-            { name: 'A', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'B', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'C', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'side', movement: null, wristY: null }},
-            { name: 'D', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'E', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'F', conditions: { fingers: { index: 'folded', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'G', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'side', movement: null, wristY: null }},
-            { name: 'H', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'side', movement: null, wristY: null }},
-            { name: 'I', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'J', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: 'arc', wristY: null }},
-            { name: 'K', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'L', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'M', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'down', movement: null, wristY: null }},
-            { name: 'N', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'down', movement: null, wristY: null }},
-            { name: 'Ñ', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: 'twist', wristY: null }},
-            { name: 'O', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'side', movement: null, wristY: null }},
-            { name: 'P', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'down', movement: null, wristY: null }},
-            { name: 'Q', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'down', movement: null, wristY: null }},
-            { name: 'R', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'S', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'T', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'U', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'V', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'W', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'X', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'side', movement: null, wristY: null }},
-            { name: 'Y', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'Z', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: 'zigzag', wristY: null }},
-            { name: '1', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
-            { name: '2', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
-            { name: '3', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
-            { name: '4', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: null, wristY: null }},
-            { name: '5', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
-            { name: '6', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
-            { name: '7', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'side', movement: null, wristY: null }},
-            { name: '8', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'side', movement: null, wristY: null }},
-            { name: '9', conditions: { fingers: { index: 'folded', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'side', movement: null, wristY: null }},
-            { name: '10', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'Mamá', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: null, wristY: '<0.3' }},
-            { name: 'Papá', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: null, wristY: '>0.4' }},
-            { name: 'Hermano', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'Hermana', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: 'vertical', wristY: null }},
-            { name: 'Rojo', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'Azul', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'side', movement: null, wristY: null }},
-            { name: 'Verde', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: 'twist', wristY: null }},
-            { name: 'Amarillo', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: '>0.3' }},
-            { name: 'Blanco', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'Negro', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'Gris', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'side', movement: 'horizontal', wristY: null }},
-            { name: 'Rosa', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'Morado', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: 'arc', wristY: null }},
-            { name: 'Naranja', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'side', movement: null, wristY: null }},
-            { name: 'Café', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: 'vertical', wristY: null }},
-            { name: 'Casa', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: 'vertical', wristY: null }},
-            { name: 'Escuela', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: 'vertical', wristY: null }},
-            { name: 'Yo', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'Tú', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'Familia', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: 'vertical', wristY: null }},
-            { name: 'Amigo', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: 'horizontal', wristY: null }},
-            { name: 'Comida', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: null, wristY: '<0.3' }},
-            { name: 'Agua', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'side', movement: null, wristY: null }},
-            { name: 'Sol', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'up', movement: 'arc', wristY: '>0.4' }},
-            { name: 'Luna', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'up', movement: 'arc', wristY: '>0.4' }},
-            { name: 'Siempre', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: 'arc', wristY: '>0.3' }},
-            { name: 'Nunca', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'towardUser', movement: 'horizontal', wristY: null }},
-            { name: 'Tiempo', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'side', movement: 'arc', wristY: null }},
-            { name: 'Feliz', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: 'arc', wristY: '>0.3' }},
-            { name: 'Triste', conditions: { fingers: { index: 'folded', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'forward', movement: 'vertical', wristY: '<0.3' }},
-            { name: 'Amor', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: 'vertical', wristY: null }},
-            { name: 'Trabajo', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'down', movement: 'horizontal', wristY: null }},
-            { name: 'Libro', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'Música', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: 'arc', wristY: null }},
-            { name: 'Día', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'up', movement: null, wristY: '>0.4' }},
-            { name: 'Pinche', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'Puto', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'towardUser', movement: null, wristY: null }},
-            { name: 'Chinga', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'towardUser', movement: null, wristY: null }},
-            { name: 'Pendejo', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'Cabrón', conditions: { fingers: { index: 'folded', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'towardUser', movement: null, wristY: null }},
-            { name: 'Inapropiado1', conditions: { fingers: { index: 'extended', middle: 'folded', ring: 'folded', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: null, wristY: null }},
-            { name: 'Inapropiado2', conditions: { fingers: { index: 'folded', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'towardUser', movement: null, wristY: null }},
-            // Additional signs
-            { name: 'Abuelo', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: null, wristY: '>0.5' }},
-            { name: 'Abuela', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'forward', movement: null, wristY: '<0.2' }},
-            { name: 'Escuchar', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'side', movement: null, wristY: null }},
-            { name: 'Hablar', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: 'arc', wristY: '<0.3' }},
-            { name: 'Calle', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'down', movement: 'horizontal', wristY: null }},
-            { name: 'Ciudad', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'folded' }, palm: 'forward', movement: 'vertical', wristY: '>0.4' }},
-            { name: 'Perro', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'folded' }, palm: 'down', movement: null, wristY: null }},
-            { name: 'Gato', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'folded', pinky: 'folded', thumb: 'extended' }, palm: 'forward', movement: 'arc', wristY: null }},
-            { name: 'Estrella', conditions: { fingers: { index: 'extended', middle: 'extended', ring: 'extended', pinky: 'extended', thumb: 'extended' }, palm: 'up', movement: null, wristY: '>0.5' }}
-        ];
 
+
+
+
+
+
+
+        const SIGN_DEFINITIONS = [
+    // Abecedario (26 letras: A-Z)
+    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", 
+    "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+    
+    // Casa (34 objetos)
+    "almohada", "azotea", "azúcarera", "baño", "barrer", "batidora", "bote", "buzón", 
+    "cacerola", "cajón", "cama", "candelero", "casa", "cazuela", "cepillo de dientes", 
+    "cepillo de pelo", "champú", "charola", "chupón", "cobertor", "coladera", "colcha", 
+    "colador", "comal", "comedor", "cómoda", "condominio", "copa", "corredor", "corriente", 
+    "cortina", "cuarto", "cuchara", "cuchillo", "departamento", "destapador",
+    
+    // Escuela (33 términos)
+    "antropología", "bandera", "calificación", "campana", "certificado", "compás", 
+    "computación", "cuaderno", "dibujo", "diccionario", "escala", "escuadra", "escuela", 
+    "estudiante", "goma", "lápiz", "lección", "mapa", "microscopio", "papel", "párrafo", 
+    "perspectiva", "pizarrón", "pluma", "politécnico", "premio", "preparatoria", "primaria", 
+    "prueba", "química", "sacapuntas", "secundaria", "tecnológico",
+    
+    // Meses (12 meses)
+    "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", 
+    "septiembre", "octubre", "noviembre", "diciembre",
+    
+    // Colores (7 colores)
+    "naranja", "rojo", "verde", "rosa", "blanco", "negro", "café",
+    
+    // Estaciones (4 estaciones)
+    "primavera", "verano", "otoño", "invierno",
+    
+    // Días de la semana (7 días)
+    "lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo",
+    
+    // Animales (15 animales)
+    "vaca", "lobo", "jirafa", "tiburón", "perro", "gato", "puerco", "rinoceronte", 
+    "serpiente", "tigre", "toro", "libélula", "lagarto", "gorila", "foca",
+    
+    // Groserías (9 términos)
+    "Grosería (Tonto)", "Grosería (Wey)", "Grosería (Idiota)", "Grosería (Puto)", 
+    "Grosería (Mierda)", "Grosería (Zorra)", "Grosería (Pendejo)", "Grosería (Verga)",
+    
+    
+    
+];
 
 
 
@@ -755,13 +703,13 @@ async function detectLSMSign(videoElement) {
 
         
 
-        function showVideos(folder) {
+function showVideos(folder) {
     const contentContainer = document.getElementById('contentContainer');
     const videoFiles = [
-        { name: 'Video 1', path: `assets/videos/${folder}/Video1.mp4` },
-        { name: 'Video 2', path: `assets/videos/${folder}/Video2.mp4` },
-        { name: 'Video 3', path: `assets/videos/${folder}/Video3.mp4` },
-        { name: 'Video 4', path: `assets/videos/${folder}/Video4.mp4` }
+        { name: 'Video 1', path: `/LENGUAJE-DE-SENAS/assets/videos/Video1.mp4` },
+        { name: 'Video 2', path: `/LENGUAJE-DE-SENAS/assets/videos/Video2.mp4` },
+        { name: 'Video 3', path: `/LENGUAJE-DE-SENAS/assets/videos/Video3.mp4` },
+        { name: 'Video 4', path: `/LENGUAJE-DE-SENAS/assets/videos/Video4.mp4` }
     ];
 
     contentContainer.innerHTML = `
@@ -1242,4 +1190,3 @@ console.log('[DEBUG] Application initialized');
 </html>
 
 
-handsInstance
