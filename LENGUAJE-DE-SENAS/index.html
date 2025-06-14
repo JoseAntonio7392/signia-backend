@@ -438,10 +438,9 @@
         minTrackingConfidence: 0.7
     });
 
-    // Nueva inicialización del modelo y webcam
     let model, webcam, maxPredictions, lastPredictionTime = 0;
     const PREDICTION_INTERVAL = 1000; // 1 fps
-    const URL = "./my_model/"; // Asegúrate de que esta ruta sea correcta
+    const URL = "/my_model/"; // Ajusta la ruta si es necesario
 
     async function init() {
         const modelURL = URL + "model.json";
@@ -453,24 +452,23 @@
         webcam = new tmImage.Webcam(224, 224, true);
         await webcam.setup();
         await webcam.play();
-        await webcam.update(); // Asegura que el primer frame esté listo
+        await webcam.update(); // Asegura el primer frame
     }
 
     async function predict() {
-    const currentTime = performance.now();
-    if (currentTime - lastPredictionTime < PREDICTION_INTERVAL) {
-        return;
-    }
+        const currentTime = performance.now();
+        if (currentTime - lastPredictionTime < PREDICTION_INTERVAL) {
+            return;
+        }
 
-        await webcam.update(); 
-    
+        await webcam.update(); // Actualiza el frame
         const prediction = await model.predict(webcam.canvas);
         for (let i = 0; i < maxPredictions; i++) {
             const classPrediction = prediction[i];
             const predictedSign = SIGN_DEFINITIONS[i] || `Desconocida (índice ${i})`;
             console.log(`[DEBUG] Class ${i}: ${predictedSign}, Probability: ${classPrediction.probability.toFixed(2)}`);
 
-            if (classPrediction.probability > 0.2) {
+            if (classPrediction.probability > 0.2) { // Umbral reducido a 0.2
                 if (predictedSign !== lastDetectedSign) {
                     console.log(`[DEBUG] Sign detected: ${predictedSign} (confidence: ${classPrediction.probability.toFixed(2)})`);
                     gesture.textContent = `Seña detectada: ${predictedSign}`;
@@ -484,7 +482,7 @@
                         speechSynthesis.cancel();
                         speechSynthesis.speak(utterance);
                     }
-                    lastDetectedSign = predictedSign; // Usamos la variable global de tu código
+                    lastDetectedSign = predictedSign;
                 }
                 lastPredictionTime = currentTime;
                 return;
@@ -553,7 +551,6 @@
         console.log('[DEBUG] Frame processed:\n' + debugInfo.join('\n'));
     });
 
-    // Continúa con el resto de startCamera
     navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'user', width: 640, height: 480 }
     }).then(stream => {
@@ -588,6 +585,9 @@
         status.classList.add('blink');
     });
 }
+
+
+
 
 
 
