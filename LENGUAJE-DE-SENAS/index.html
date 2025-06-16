@@ -173,6 +173,13 @@
             border-radius: 0.25rem;
             border: 1px solid #4a5568;
         }
+        .test-voice-button {
+            background: linear-gradient(to right, #48bb78, #38a169);
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
         .header-logo {
             filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
         }
@@ -189,6 +196,7 @@
     <canvas id="starfield"></canvas>
     <div id="app"></div>
     <script>
+        // Código actualizado a las 01:21 AM CST on Monday, June 16, 2025
         console.log('[DEBUG] Script started at ' + new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }));
 
         // Starfield and Moon animation
@@ -274,37 +282,27 @@
         const DETECTION_HISTORY_SIZE = 5;
 
         const SIGN_DEFINITIONS = [
-            // Abecedario
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
             'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-            // Casa
             'almohada', 'azotea', 'azúcarera', 'baño', 'barrer', 'batidora', 'bote', 'buzón',
             'cacerola', 'cajón', 'cama', 'candelero', 'casa', 'cazuela', 'cepillo de dientes',
             'cepillo de pelo', 'champú', 'charola', 'chupón', 'cobertor', 'coladera', 'colcha',
             'colador', 'comal', 'comedor', 'cómoda', 'condominio', 'copa', 'corredor', 'corriente',
             'cortina', 'cuarto', 'cuchara', 'cuchillo', 'departamento', 'destapador',
-            // Escuela
             'antropología', 'bandera', 'calificación', 'campana', 'certificado', 'compás',
             'computación', 'cuaderno', 'dibujo', 'diccionario', 'escala', 'escuadra', 'escuela',
             'estudiante', 'goma', 'lápiz', 'lección', 'mapa', 'microscopio', 'papel', 'párrafo',
             'perspectiva', 'pizarrón', 'pluma', 'politécnico', 'premio', 'preparatoria', 'primaria',
             'prueba', 'química', 'sacapuntas', 'secundaria', 'tecnológico',
-            // Meses
             'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto',
             'septiembre', 'octubre', 'noviembre', 'diciembre',
-            // Colores
             'naranja', 'rojo', 'verde', 'rosa', 'blanco', 'negro', 'café',
-            // Estaciones
             'primavera', 'verano', 'otoño', 'invierno',
-            // Días de la semana
             'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo',
-            // Animales
             'vaca', 'lobo', 'jirafa', 'tiburón', 'perro', 'gato', 'puerco', 'rinoceronte',
             'serpiente', 'tigre', 'toro', 'libélula', 'lagarto', 'gorila', 'foca',
-            // Groserías
             'Grosería (Tonto)', 'Grosería (Güey)', 'Grosería (Idiota)', 'Grosería (Puto)',
             'Grosería (Mierda)', 'Grosería (Zorra)', 'Grosería (Pendejo)', 'Grosería (Verga)',
-            // Saludos y otras palabras
             'saludo_hola', 'saludo_adios', 'saludo_como_estas', 'saludo_comparte', 'saludo_ayuda'
         ];
 
@@ -346,11 +344,11 @@
             );
         }
 
-        function estaDedoDoblado(tip, mcp, umbral = 0.05) {
+        function estaDedoDoblado(tip, mcp, umbral = 0.04) {
             return distanciaEuclidiana(tip, mcp) < umbral;
         }
 
-        function estaDedoExtendido(tip, mcp, umbral = 0.07) {
+        function estaDedoExtendido(tip, mcp, umbral = 0.05) {
             return distanciaEuclidiana(tip, mcp) > umbral;
         }
 
@@ -360,7 +358,6 @@
             const normalized = normalizeLandmarks(landmarks);
             const smoothed = smoothLandmarks(normalized);
 
-            // Landmark indices for fingers
             const THUMB_TIP = 4, THUMB_MCP = 2;
             const INDEX_TIP = 8, INDEX_MCP = 5;
             const MIDDLE_TIP = 12, MIDDLE_MCP = 9;
@@ -368,125 +365,164 @@
             const PINKY_TIP = 20, PINKY_MCP = 17;
             const WRIST = 0;
 
+            let debugSignInfo = [];
+
             // Letter A: Fist with thumb on side
-            const isThumbAsideA = smoothed[THUMB_TIP].x > smoothed[INDEX_MCP].x + 0.03;
-            const isIndexFoldedA = estaDedoDoblado(smoothed[INDEX_TIP], smoothed[INDEX_MCP], 0.06);
-            const isMiddleFoldedA = estaDedoDoblado(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP], 0.06);
-            const isRingFoldedA = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP], 0.06);
-            const isPinkyFoldedA = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP], 0.06);
+            const isThumbAsideA = smoothed[THUMB_TIP].x > smoothed[INDEX_MCP].x + 0.02;
+            const isIndexFoldedA = estaDedoDoblado(smoothed[INDEX_TIP], smoothed[INDEX_MCP]);
+            const isMiddleFoldedA = estaDedoDoblado(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]);
+            const isRingFoldedA = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP]);
+            const isPinkyFoldedA = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP]);
             if (isThumbAsideA && isIndexFoldedA && isMiddleFoldedA && isRingFoldedA && isPinkyFoldedA) {
+                debugSignInfo.push('Detected A');
                 return 'A';
+            } else {
+                debugSignInfo.push(`A failed: ThumbAside=${isThumbAsideA}, IndexFolded=${isIndexFoldedA}, MiddleFolded=${isMiddleFoldedA}, RingFolded=${isRingFoldedA}, PinkyFolded=${isPinkyFoldedA}`);
             }
 
             // Letter B: All fingers extended, thumb folded across palm
-            const isThumbFoldedB = distanciaEuclidiana(smoothed[THUMB_TIP], smoothed[PINKY_MCP]) < 0.12;
-            const isIndexExtendedB = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP], 0.06);
-            const isMiddleExtendedB = estaDedoExtendido(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP], 0.06);
-            const isRingExtendedB = estaDedoExtendido(smoothed[RING_TIP], smoothed[RING_MCP], 0.06);
-            const isPinkyExtendedB = estaDedoExtendido(smoothed[PINKY_TIP], smoothed[PINKY_MCP], 0.06);
+            const isThumbFoldedB = distanciaEuclidiana(smoothed[THUMB_TIP], smoothed[PINKY_MCP]) < 0.10;
+            const isIndexExtendedB = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP]);
+            const isMiddleExtendedB = estaDedoExtendido(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]);
+            const isRingExtendedB = estaDedoExtendido(smoothed[RING_TIP], smoothed[RING_MCP]);
+            const isPinkyExtendedB = estaDedoExtendido(smoothed[PINKY_TIP], smoothed[PINKY_MCP]);
             if (isThumbFoldedB && isIndexExtendedB && isMiddleExtendedB && isRingExtendedB && isPinkyExtendedB) {
+                debugSignInfo.push('Detected B');
                 return 'B';
+            } else {
+                debugSignInfo.push(`B failed: ThumbFolded=${isThumbFoldedB}, IndexExtended=${isIndexExtendedB}, MiddleExtended=${isMiddleExtendedB}, RingExtended=${isRingExtendedB}, PinkyExtended=${isPinkyExtendedB}`);
             }
 
             // Letter C: Fingers curved, thumb and fingers forming a C shape
             const thumbIndexDistC = distanciaEuclidiana(smoothed[THUMB_TIP], smoothed[INDEX_TIP]);
-            const isCFingerShape = thumbIndexDistC > 0.08 && thumbIndexDistC < 0.22;
-            const isMiddleCurvedC = distanciaEuclidiana(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]) > 0.04 && distanciaEuclidiana(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]) < 0.12;
+            const isCFingerShape = thumbIndexDistC > 0.06 && thumbIndexDistC < 0.20;
+            const isMiddleCurvedC = distanciaEuclidiana(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]) > 0.03 && distanciaEuclidiana(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]) < 0.10;
             if (isCFingerShape && isMiddleCurvedC) {
+                debugSignInfo.push('Detected C');
                 return 'C';
+            } else {
+                debugSignInfo.push(`C failed: CFingerShape=${isCFingerShape}, MiddleCurved=${isMiddleCurvedC}`);
             }
 
             // Letter D: Index extended, others folded, thumb touches middle
-            const isIndexExtendedD = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP], 0.06);
-            const isMiddleFoldedD = estaDedoDoblado(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP], 0.06);
-            const isRingFoldedD = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP], 0.06);
-            const isPinkyFoldedD = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP], 0.06);
-            const isThumbTouchingMiddleD = distanciaEuclidiana(smoothed[THUMB_TIP], smoothed[MIDDLE_MCP]) < 0.08;
+            const isIndexExtendedD = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP]);
+            const isMiddleFoldedD = estaDedoDoblado(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]);
+            const isRingFoldedD = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP]);
+            const isPinkyFoldedD = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP]);
+            const isThumbTouchingMiddleD = distanciaEuclidiana(smoothed[THUMB_TIP], smoothed[MIDDLE_MCP]) < 0.06;
             if (isIndexExtendedD && isMiddleFoldedD && isRingFoldedD && isPinkyFoldedD && isThumbTouchingMiddleD) {
+                debugSignInfo.push('Detected D');
                 return 'D';
+            } else {
+                debugSignInfo.push(`D failed: IndexExtended=${isIndexExtendedD}, MiddleFolded=${isMiddleFoldedD}, RingFolded=${isRingFoldedD}, PinkyFolded=${isPinkyFoldedD}, ThumbTouchingMiddle=${isThumbTouchingMiddleD}`);
             }
 
             // Letter F: Index and thumb form a circle, others extended
-            const isThumbIndexCircleF = distanciaEuclidiana(smoothed[THUMB_TIP], smoothed[INDEX_TIP]) < 0.08;
-            const isMiddleExtendedF = estaDedoExtendido(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP], 0.06);
-            const isRingExtendedF = estaDedoExtendido(smoothed[RING_TIP], smoothed[RING_MCP], 0.06);
-            const isPinkyExtendedF = estaDedoExtendido(smoothed[PINKY_TIP], smoothed[PINKY_MCP], 0.06);
+            const isThumbIndexCircleF = distanciaEuclidiana(smoothed[THUMB_TIP], smoothed[INDEX_TIP]) < 0.06;
+            const isMiddleExtendedF = estaDedoExtendido(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]);
+            const isRingExtendedF = estaDedoExtendido(smoothed[RING_TIP], smoothed[RING_MCP]);
+            const isPinkyExtendedF = estaDedoExtendido(smoothed[PINKY_TIP], smoothed[PINKY_MCP]);
             if (isThumbIndexCircleF && isMiddleExtendedF && isRingExtendedF && isPinkyExtendedF) {
+                debugSignInfo.push('Detected F');
                 return 'F';
+            } else {
+                debugSignInfo.push(`F failed: ThumbIndexCircle=${isThumbIndexCircleF}, MiddleExtended=${isMiddleExtendedF}, RingExtended=${isRingExtendedF}, PinkyExtended=${isPinkyExtendedF}`);
             }
 
             // Letter G: Index and thumb extended, others folded
-            const isIndexExtendedG = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP], 0.06);
-            const isThumbExtendedG = estaDedoExtendido(smoothed[THUMB_TIP], smoothed[THUMB_MCP], 0.06);
-            const isMiddleFoldedG = estaDedoDoblado(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP], 0.06);
-            const isRingFoldedG = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP], 0.06);
-            const isPinkyFoldedG = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP], 0.06);
+            const isIndexExtendedG = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP]);
+            const isThumbExtendedG = estaDedoExtendido(smoothed[THUMB_TIP], smoothed[THUMB_MCP]);
+            const isMiddleFoldedG = estaDedoDoblado(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]);
+            const isRingFoldedG = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP]);
+            const isPinkyFoldedG = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP]);
             if (isIndexExtendedG && isThumbExtendedG && isMiddleFoldedG && isRingFoldedG && isPinkyFoldedG) {
+                debugSignInfo.push('Detected G');
                 return 'G';
+            } else {
+                debugSignInfo.push(`G failed: IndexExtended=${isIndexExtendedG}, ThumbExtended=${isThumbExtendedG}, MiddleFolded=${isMiddleFoldedG}, RingFolded=${isRingFoldedG}, PinkyFolded=${isPinkyFoldedG}`);
             }
 
             // Letter H: Index and middle extended, others folded
-            const isIndexExtendedH = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP], 0.06);
-            const isMiddleExtendedH = estaDedoExtendido(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP], 0.06);
-            const isRingFoldedH = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP], 0.06);
-            const isPinkyFoldedH = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP], 0.06);
-            const isThumbAsideH = smoothed[THUMB_TIP].x > smoothed[MIDDLE_MCP].x + 0.03;
+            const isIndexExtendedH = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP]);
+            const isMiddleExtendedH = estaDedoExtendido(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]);
+            const isRingFoldedH = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP]);
+            const isPinkyFoldedH = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP]);
+            const isThumbAsideH = smoothed[THUMB_TIP].x > smoothed[MIDDLE_MCP].x + 0.02;
             if (isIndexExtendedH && isMiddleExtendedH && isRingFoldedH && isPinkyFoldedH && isThumbAsideH) {
+                debugSignInfo.push('Detected H');
                 return 'H';
+            } else {
+                debugSignInfo.push(`H failed: IndexExtended=${isIndexExtendedH}, MiddleExtended=${isMiddleExtendedH}, RingFolded=${isRingFoldedH}, PinkyFolded=${isPinkyFoldedH}, ThumbAside=${isThumbAsideH}`);
             }
 
             // Hola: Open hand near face, palm facing inward
-            const isHandOpenHola = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP], 0.06) &&
-                                   estaDedoExtendido(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP], 0.06) &&
-                                   estaDedoExtendido(smoothed[RING_TIP], smoothed[RING_MCP], 0.06) &&
-                                   estaDedoExtendido(smoothed[PINKY_TIP], smoothed[PINKY_MCP], 0.06);
-            const isPalmInwardHola = smoothed[THUMB_TIP].x < smoothed[PINKY_TIP].x; // Palm faces user
-            const isNearFaceHola = smoothed[WRIST].y < -0.2; // Hand high in frame (near face)
+            const isHandOpenHola = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP]) &&
+                                   estaDedoExtendido(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]) &&
+                                   estaDedoExtendido(smoothed[RING_TIP], smoothed[RING_MCP]) &&
+                                   estaDedoExtendido(smoothed[PINKY_TIP], smoothed[PINKY_MCP]);
+            const isPalmInwardHola = smoothed[THUMB_TIP].x < smoothed[PINKY_TIP].x;
+            const isNearFaceHola = smoothed[WRIST].y < 0.2; // Ampliado el rango
             if (isHandOpenHola && isPalmInwardHola && isNearFaceHola) {
+                debugSignInfo.push('Detected Hola');
                 return 'saludo_hola';
+            } else {
+                debugSignInfo.push(`Hola failed: HandOpen=${isHandOpenHola}, PalmInward=${isPalmInwardHola}, NearFace=${isNearFaceHola}, WristY=${smoothed[WRIST].y}`);
             }
 
             // Adiós: Open hand, palm outward, fingers extended
-            const isHandOpenAdios = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP], 0.06) &&
-                                    estaDedoExtendido(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP], 0.06) &&
-                                    estaDedoExtendido(smoothed[RING_TIP], smoothed[RING_MCP], 0.06) &&
-                                    estaDedoExtendido(smoothed[PINKY_TIP], smoothed[PINKY_MCP], 0.06);
-            const isPalmOutwardAdios = smoothed[THUMB_TIP].x > smoothed[PINKY_TIP].x; // Palm faces away
+            const isHandOpenAdios = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP]) &&
+                                    estaDedoExtendido(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]) &&
+                                    estaDedoExtendido(smoothed[RING_TIP], smoothed[RING_MCP]) &&
+                                    estaDedoExtendido(smoothed[PINKY_TIP], smoothed[PINKY_MCP]);
+            const isPalmOutwardAdios = smoothed[THUMB_TIP].x > smoothed[PINKY_TIP].x;
             if (isHandOpenAdios && isPalmOutwardAdios) {
+                debugSignInfo.push('Detected Adiós');
                 return 'saludo_adios';
+            } else {
+                debugSignInfo.push(`Adiós failed: HandOpen=${isHandOpenAdios}, PalmOutward=${isPalmOutwardAdios}`);
             }
 
             // Cómo estás: Hand in C shape near chin
             const thumbIndexDistComoEstas = distanciaEuclidiana(smoothed[THUMB_TIP], smoothed[INDEX_TIP]);
-            const isCFingerShapeComoEstas = thumbIndexDistC > 0.08 && thumbIndexDistC < 0.22;
-            const isMiddleCurvedComoEstas = distanciaEuclidiana(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]) > 0.04 && distanciaEuclidiana(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]) < 0.12;
-            const isNearChinComoEstas = smoothed[WRIST].y < -0.2 && smoothed[WRIST].y > -0.4; // Near chin level
+            const isCFingerShapeComoEstas = thumbIndexDistComoEstas > 0.06 && thumbIndexDistComoEstas < 0.20;
+            const isMiddleCurvedComoEstas = distanciaEuclidiana(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]) > 0.03 && distanciaEuclidiana(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]) < 0.10;
+            const isNearChinComoEstas = smoothed[WRIST].y < 0.2 && smoothed[WRIST].y > -0.4; // Ampliado el rango
             if (isCFingerShapeComoEstas && isMiddleCurvedComoEstas && isNearChinComoEstas) {
+                debugSignInfo.push('Detected Cómo estás');
                 return 'saludo_como_estas';
+            } else {
+                debugSignInfo.push(`Cómo estás failed: CFingerShape=${isCFingerShapeComoEstas}, MiddleCurved=${isMiddleCurvedComoEstas}, NearChin=${isNearChinComoEstas}, WristY=${smoothed[WRIST].y}`);
             }
 
             // Comparte: V shape (index and middle extended), palm down
-            const isIndexExtendedComparte = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP], 0.06);
-            const isMiddleExtendedComparte = estaDedoExtendido(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP], 0.06);
-            const isRingFoldedComparte = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP], 0.06);
-            const isPinkyFoldedComparte = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP], 0.06);
-            const isPalmDownComparte = smoothed[INDEX_TIP].z > smoothed[WRIST].z; // Palm faces down
+            const isIndexExtendedComparte = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP]);
+            const isMiddleExtendedComparte = estaDedoExtendido(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]);
+            const isRingFoldedComparte = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP]);
+            const isPinkyFoldedComparte = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP]);
+            const isPalmDownComparte = smoothed[INDEX_TIP].z > smoothed[WRIST].z;
             if (isIndexExtendedComparte && isMiddleExtendedComparte && isRingFoldedComparte && isPinkyFoldedComparte && isPalmDownComparte) {
+                debugSignInfo.push('Detected Comparte');
                 return 'saludo_comparte';
+            } else {
+                debugSignInfo.push(`Comparte failed: IndexExtended=${isIndexExtendedComparte}, MiddleExtended=${isMiddleExtendedComparte}, RingFolded=${isRingFoldedComparte}, PinkyFolded=${isPinkyFoldedComparte}, PalmDown=${isPalmDownComparte}`);
             }
 
             // Ayuda: A shape, palm up, near chest
-            const isThumbAsideAyuda = smoothed[THUMB_TIP].x > smoothed[INDEX_MCP].x + 0.03;
-            const isIndexFoldedAyuda = estaDedoDoblado(smoothed[INDEX_TIP], smoothed[INDEX_MCP], 0.06);
-            const isMiddleFoldedAyuda = estaDedoDoblado(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP], 0.06);
-            const isRingFoldedAyuda = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP], 0.06);
-            const isPinkyFoldedAyuda = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP], 0.06);
-            const isPalmUpAyuda = smoothed[INDEX_TIP].z < smoothed[WRIST].z; // Palm faces up
-            const isNearChestAyuda = smoothed[WRIST].y > -0.1 && smoothed[WRIST].y < 0.1; // Chest level
+            const isThumbAsideAyuda = smoothed[THUMB_TIP].x > smoothed[INDEX_MCP].x + 0.02;
+            const isIndexFoldedAyuda = estaDedoDoblado(smoothed[INDEX_TIP], smoothed[INDEX_MCP]);
+            const isMiddleFoldedAyuda = estaDedoDoblado(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]);
+            const isRingFoldedAyuda = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP]);
+            const isPinkyFoldedAyuda = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP]);
+            const isPalmUpAyuda = smoothed[INDEX_TIP].z < smoothed[WRIST].z;
+            const isNearChestAyuda = smoothed[WRIST].y > -0.3 && smoothed[WRIST].y < 0.3; // Ampliado el rango
             if (isThumbAsideAyuda && isIndexFoldedAyuda && isMiddleFoldedAyuda && isRingFoldedAyuda && isPinkyFoldedAyuda && isPalmUpAyuda && isNearChestAyuda) {
+                debugSignInfo.push('Detected Ayuda');
                 return 'saludo_ayuda';
+            } else {
+                debugSignInfo.push(`Ayuda failed: ThumbAside=${isThumbAsideAyuda}, IndexFolded=${isIndexFoldedAyuda}, MiddleFolded=${isMiddleFoldedAyuda}, RingFolded=${isRingFoldedAyuda}, PinkyFolded=${isPinkyFoldedAyuda}, PalmUp=${isPalmUpAyuda}, NearChest=${isNearChestAyuda}`);
             }
 
+            console.log('[DEBUG] Sign detection:\n' + debugSignInfo.join('\n'));
             return null;
         }
 
@@ -552,7 +588,6 @@
                             drawLandmarks(canvasCtx, landmarks, { color: '#a855f7', lineWidth: 2 });
 
                             let sign = detectLSMSign(landmarks);
-                            // Map prefixed signs to user-friendly names
                             if (sign && sign.startsWith('saludo_')) {
                                 sign = sign.replace('saludo_', '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
                             }
@@ -602,25 +637,40 @@
                     debugMessage.textContent = debugInfo.join('\n');
                     debugMessage.classList.remove('hidden');
 
-                    if (selectedVoice && 'speechSynthesis' in window) {
-                        const utterance = new SpeechSynthesisUtterance(detectedSign);
-                        utterance.voice = selectedVoice;
-                        utterance.lang = selectedVoice ? selectedVoice.lang : 'es-MX';
-                        utterance.volume = 1;
-                        utterance.rate = 1;
-                        utterance.pitch = 1;
-                        speechSynthesis.cancel();
-                        speechSynthesis.speak(utterance);
+                    if ('speechSynthesis' in window && selectedVoice) {
+                        try {
+                            const utterance = new SpeechSynthesisUtterance(detectedSign);
+                            utterance.voice = selectedVoice;
+                            utterance.lang = selectedVoice.lang || 'es-MX';
+                            utterance.volume = 1;
+                            utterance.rate = 1;
+                            utterance.pitch = 1;
+                            utterance.onend = () => {
+                                sePuedeDetectar = true;
+                                console.log('[DEBUG] Utterance ended, sePuedeDetectar reset to true');
+                            };
+                            utterance.onerror = (event) => {
+                                console.error('[ERROR] SpeechSynthesisUtterance error:', event.error);
+                                sePuedeDetectar = true;
+                            };
+                            sePuedeDetectar = false;
+                            speechSynthesis.speak(utterance);
+                            console.log(`[DEBUG] Speaking: ${detectedSign}, Voice: ${selectedVoice.name}, Lang: ${utterance.lang}`);
+                        } catch (speechError) {
+                            console.error('[ERROR] Failed to speak:', speechError);
+                            sePuedeDetectar = true;
+                            errorMessage.textContent = 'Error al reproducir la voz.';
+                            errorMessage.classList.remove('hidden');
+                        }
+                    } else {
+                        console.warn('[DEBUG] SpeechSynthesis not ready or no voice selected');
+                        errorMessage.textContent = 'Síntesis de voz no disponible o voz no seleccionada.';
+                        errorMessage.classList.remove('hidden');
                     }
                     lastDetectedSign = detectedSign;
                     ultimaSeña = detectedSign;
-                    sePuedeDetectar = false;
-                    setTimeout(() => {
-                        sePuedeDetectar = true;
-                    }, 800);
                 } else if (!detectedSign) {
                     gesture.textContent = 'Seña detectada: Ninguna';
-                    lastDetectedSign = null;
                     debugMessage.textContent = debugInfo.join('\n');
                     debugMessage.classList.remove('hidden');
                 }
@@ -786,6 +836,8 @@
                         <select id="voiceSelect" class="combobox mt-2">
                             <option value="" disabled selected>Elige una voz</option>
                         </select>
+                        <button id="testVoiceButton" class="test-voice-button">Probar Voz</button>
+                        <button id="initSpeechButton" class="test-voice-button mt-2">Inicializar Voz</button>
                         <p id="status" class="status-text mt-4">Iniciando cámara...</p>
                         <p id="gesture" class="status-text mt-2">Seña detectada: Ninguna</p>
                         <div id="errorMessage" class="error-message hidden mt-4"></div>
@@ -795,6 +847,35 @@
             `;
             document.getElementById('backToMenu').addEventListener('click', renderMainScreen);
             document.getElementById('userButton').addEventListener('click', renderUserScreen);
+            document.getElementById('testVoiceButton').addEventListener('click', () => {
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance('Prueba de voz');
+                    utterance.voice = selectedVoice;
+                    utterance.lang = selectedVoice ? selectedVoice.lang : 'es-MX';
+                    utterance.volume = 1;
+                    utterance.rate = 1;
+                    utterance.pitch = 1;
+                    speechSynthesis.speak(utterance);
+                    console.log('[DEBUG] Test voice triggered');
+                } else {
+                    const errorMessage = document.getElementById('errorMessage');
+                    errorMessage.textContent = 'Síntesis de voz no soportada en este navegador.';
+                    errorMessage.classList.remove('hidden');
+                }
+            });
+            document.getElementById('initSpeechButton').addEventListener('click', () => {
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance('');
+                    utterance.volume = 0; // Silencioso para no molestar
+                    speechSynthesis.speak(utterance);
+                    console.log('[DEBUG] SpeechSynthesis initialized');
+                    const errorMessage = document.getElementById('errorMessage');
+                    errorMessage.textContent = 'Voz inicializada correctamente.';
+                    errorMessage.classList.remove('hidden', 'error-message');
+                    errorMessage.classList.add('text-green-500');
+                    setTimeout(() => errorMessage.classList.add('hidden'), 2000);
+                }
+            });
             populateVoiceSelect();
             startCamera();
             console.log('[DEBUG] Traducción screen rendered');
@@ -802,6 +883,7 @@
 
         function populateVoiceSelect() {
             const voiceSelect = document.getElementById('voiceSelect');
+            const errorMessage = document.getElementById('errorMessage');
             if (!voiceSelect) return;
 
             const updateVoices = () => {
@@ -810,6 +892,10 @@
                 if (voices.length === 0) {
                     voiceSelect.innerHTML += '<option value="" disabled>No hay voces disponibles</option>';
                     console.warn('[DEBUG] No voices available');
+                    if (errorMessage) {
+                        errorMessage.textContent = 'No se encontraron voces disponibles. Intenta en otro navegador.';
+                        errorMessage.classList.remove('hidden');
+                    }
                     return;
                 }
                 const spanishVoices = voices.filter(v => v.lang.startsWith('es-'));
@@ -821,18 +907,29 @@
                     voiceSelect.appendChild(option);
                 });
                 if (spanishVoices.length > 0) {
-                    selectedVoice = spanishVoices[0];
-                    voiceSelect.value = voices.indexOf(spanishVoices[0]);
+                    selectedVoice = spanishVoices.find(v => v.lang === 'es-MX') || spanishVoices[0];
+                    voiceSelect.value = voices.indexOf(selectedVoice);
+                    console.log('[DEBUG] Default Spanish voice selected: ' + selectedVoice.name);
                 } else if (voices.length > 0) {
                     selectedVoice = voices[0];
                     voiceSelect.value = 0;
+                    console.log('[DEBUG] Default non-Spanish voice selected: ' + selectedVoice.name);
                 }
             };
 
-            if (speechSynthesis.getVoices().length > 0) {
-                updateVoices();
+            if ('speechSynthesis' in window) {
+                if (speechSynthesis.getVoices().length > 0) {
+                    updateVoices();
+                } else {
+                    speechSynthesis.onvoiceschanged = updateVoices;
+                    setTimeout(updateVoices, 1000);
+                }
             } else {
-                speechSynthesis.onvoiceschanged = updateVoices;
+                console.warn('[DEBUG] SpeechSynthesis not supported');
+                if (errorMessage) {
+                    errorMessage.textContent = 'Síntesis de voz no soportada en este navegador.';
+                    errorMessage.classList.remove('hidden');
+                }
             }
 
             voiceSelect.addEventListener('change', () => {
@@ -1165,6 +1262,7 @@
             if (items === 0) return;
             currentIndex = 0;
             carousel.style.transform = `translateX(0%)`;
+            console.log('[DEBUG] Carousel initialized');
         }
 
         function moveCarousel(direction) {
@@ -1174,14 +1272,12 @@
             if (items === 0) return;
             currentIndex = (currentIndex + direction + items) % items;
             carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
-            console.log('[DEBUG] Carousel moved: index=' + currentIndex);
+            console.log('[DEBUG] Carousel moved to index: ' + currentIndex);
         }
 
         window.moveCarousel = moveCarousel;
 
         renderMainScreen();
-
-        console.log('[DEBUG] Application initialized');
     </script>
 </body>
 </html>
