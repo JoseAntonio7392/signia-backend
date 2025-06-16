@@ -12,7 +12,7 @@
         body {
             margin: 0;
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(to bottom, #1a202c, #2d3748);
+            background: linear-gradient(to bottom, #11357d, #4c2950);
             color: white;
             overflow-x: hidden;
         }
@@ -173,13 +173,6 @@
             border-radius: 0.25rem;
             border: 1px solid #4a5568;
         }
-        .test-voice-button {
-            background: linear-gradient(to right, #48bb78, #38a169);
-            padding: 0.5rem 1rem;
-            border-radius: 0.25rem;
-            font-weight: bold;
-            margin-top: 1rem;
-        }
         .header-logo {
             filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
         }
@@ -196,7 +189,6 @@
     <canvas id="starfield"></canvas>
     <div id="app"></div>
     <script>
-        // Código actualizado a las 01:21 AM CST on Monday, June 16, 2025
         console.log('[DEBUG] Script started at ' + new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }));
 
         // Starfield and Moon animation
@@ -303,8 +295,40 @@
             'serpiente', 'tigre', 'toro', 'libélula', 'lagarto', 'gorila', 'foca',
             'Grosería (Tonto)', 'Grosería (Güey)', 'Grosería (Idiota)', 'Grosería (Puto)',
             'Grosería (Mierda)', 'Grosería (Zorra)', 'Grosería (Pendejo)', 'Grosería (Verga)',
-            'saludo_hola', 'saludo_adios', 'saludo_como_estas', 'saludo_comparte', 'saludo_ayuda'
+            'saludo_hola', 'saludo_adios', 'saludo_como_estas', 'saludo_comparte', 'saludo_ayuda', 'saludo_buenos_dias',
+            'familia', 'amigo', 'amor', 'trabajo', 'viaje', 'comida', 'agua', 'sol'
         ];
+
+        const SIGN_TRANSLATIONS = {
+            'A': 'A', 'B': 'B', 'C': 'C', 'D': 'D', 'E': 'E', 'F': 'F', 'G': 'G', 'H': 'H', 'I': 'I', 'J': 'J', 'K': 'K', 'L': 'L', 'M': 'M',
+            'N': 'N', 'O': 'O', 'P': 'P', 'Q': 'Q', 'R': 'R', 'S': 'S', 'T': 'T', 'U': 'U', 'V': 'V', 'W': 'W', 'X': 'X', 'Y': 'Y', 'Z': 'Z',
+            'almohada': 'Pillow', 'azotea': 'Rooftop', 'azúcarera': 'Sugar Bowl', 'baño': 'Bathroom', 'barrer': 'Sweep', 'batidora': 'Blender',
+            'bote': 'Can', 'buzón': 'Mailbox', 'cacerola': 'Saucepan', 'cajón': 'Drawer', 'cama': 'Bed', 'candelero': 'Candleholder',
+            'casa': 'House', 'cazuela': 'Casserole', 'cepillo de dientes': 'Toothbrush', 'cepillo de pelo': 'Hairbrush', 'champú': 'Shampoo',
+            'charola': 'Tray', 'chupón': 'Pacifier', 'cobertor': 'Blanket', 'coladera': 'Drain', 'colcha': 'Quilt', 'colador': 'Strainer',
+            'comal': 'Griddle', 'comedor': 'Dining Room', 'cómoda': 'Chest of Drawers', 'condominio': 'Condominium', 'copa': 'Glass',
+            'corredor': 'Hallway', 'corriente': 'Current', 'cortina': 'Curtain', 'cuarto': 'Room', 'cuchara': 'Spoon', 'cuchillo': 'Knife',
+            'departamento': 'Apartment', 'destapador': 'Bottle Opener', 'antropología': 'Anthropology', 'bandera': 'Flag',
+            'calificación': 'Grade', 'campana': 'Bell', 'certificado': 'Certificate', 'compás': 'Compass', 'computación': 'Computing',
+            'cuaderno': 'Notebook', 'dibujo': 'Drawing', 'diccionario': 'Dictionary', 'escala': 'Scale', 'escuadra': 'Square',
+            'escuela': 'School', 'estudiante': 'Student', 'goma': 'Eraser', 'lápiz': 'Pencil', 'lección': 'Lesson', 'mapa': 'Map',
+            'microscopio': 'Microscope', 'papel': 'Paper', 'párrafo': 'Paragraph', 'perspectiva': 'Perspective', 'pizarrón': 'Blackboard',
+            'pluma': 'Pen', 'politécnico': 'Polytechnic', 'premio': 'Prize', 'preparatoria': 'High School', 'primaria': 'Elementary School',
+            'prueba': 'Test', 'química': 'Chemistry', 'sacapuntas': 'Sharpener', 'secundaria': 'Middle School', 'tecnológico': 'Technological',
+            'enero': 'January', 'febrero': 'February', 'marzo': 'March', 'abril': 'April', 'mayo': 'May', 'junio': 'June', 'julio': 'July',
+            'agosto': 'August', 'septiembre': 'September', 'octubre': 'October', 'noviembre': 'November', 'diciembre': 'December',
+            'naranja': 'Orange', 'rojo': 'Red', 'verde': 'Green', 'rosa': 'Pink', 'blanco': 'White', 'negro': 'Black', 'café': 'Brown',
+            'primavera': 'Spring', 'verano': 'Summer', 'otoño': 'Autumn', 'invierno': 'Winter', 'lunes': 'Monday', 'martes': 'Tuesday',
+            'miércoles': 'Wednesday', 'jueves': 'Thursday', 'viernes': 'Friday', 'sábado': 'Saturday', 'domingo': 'Sunday',
+            'vaca': 'Cow', 'lobo': 'Wolf', 'jirafa': 'Giraffe', 'tiburón': 'Shark', 'perro': 'Dog', 'gato': 'Cat', 'puerco': 'Pig',
+            'rinoceronte': 'Rhinoceros', 'serpiente': 'Snake', 'tigre': 'Tiger', 'toro': 'Bull', 'libélula': 'Dragonfly', 'lagarto': 'Lizard',
+            'gorila': 'Gorilla', 'foca': 'Seal', 'Grosería (Tonto)': 'Insult (Fool)', 'Grosería (Güey)': 'Insult (Dude)',
+            'Grosería (Idiota)': 'Insult (Idiot)', 'Grosería (Puto)': 'Insult (Bastard)', 'Grosería (Mierda)': 'Insult (Shit)',
+            'Grosería (Zorra)': 'Insult (Bitch)', 'Grosería (Pendejo)': 'Insult (Asshole)', 'Grosería (Verga)': 'Insult (Dick)',
+            'saludo_hola': 'Hello', 'saludo_adios': 'Goodbye', 'saludo_como_estas': 'How are you', 'saludo_comparte': 'Share',
+            'saludo_ayuda': 'Help', 'saludo_buenos_dias': 'Good morning', 'familia': 'Family', 'amigo': 'Friend', 'amor': 'Love',
+            'trabajo': 'Work', 'viaje': 'Trip', 'comida': 'Food', 'agua': 'Water', 'sol': 'Sun'
+        };
 
         function normalizeLandmarks(landmarks) {
             if (!landmarks || landmarks.length !== 21) {
@@ -461,7 +485,7 @@
                                    estaDedoExtendido(smoothed[RING_TIP], smoothed[RING_MCP]) &&
                                    estaDedoExtendido(smoothed[PINKY_TIP], smoothed[PINKY_MCP]);
             const isPalmInwardHola = smoothed[THUMB_TIP].x < smoothed[PINKY_TIP].x;
-            const isNearFaceHola = smoothed[WRIST].y < 0.2; // Ampliado el rango
+            const isNearFaceHola = smoothed[WRIST].y < 0.2;
             if (isHandOpenHola && isPalmInwardHola && isNearFaceHola) {
                 debugSignInfo.push('Detected Hola');
                 return 'saludo_hola';
@@ -486,7 +510,7 @@
             const thumbIndexDistComoEstas = distanciaEuclidiana(smoothed[THUMB_TIP], smoothed[INDEX_TIP]);
             const isCFingerShapeComoEstas = thumbIndexDistComoEstas > 0.06 && thumbIndexDistComoEstas < 0.20;
             const isMiddleCurvedComoEstas = distanciaEuclidiana(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]) > 0.03 && distanciaEuclidiana(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]) < 0.10;
-            const isNearChinComoEstas = smoothed[WRIST].y < 0.2 && smoothed[WRIST].y > -0.4; // Ampliado el rango
+            const isNearChinComoEstas = smoothed[WRIST].y < 0.1 && smoothed[WRIST].y > -0.3;
             if (isCFingerShapeComoEstas && isMiddleCurvedComoEstas && isNearChinComoEstas) {
                 debugSignInfo.push('Detected Cómo estás');
                 return 'saludo_como_estas';
@@ -514,7 +538,7 @@
             const isRingFoldedAyuda = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP]);
             const isPinkyFoldedAyuda = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP]);
             const isPalmUpAyuda = smoothed[INDEX_TIP].z < smoothed[WRIST].z;
-            const isNearChestAyuda = smoothed[WRIST].y > -0.3 && smoothed[WRIST].y < 0.3; // Ampliado el rango
+            const isNearChestAyuda = smoothed[WRIST].y > -0.3 && smoothed[WRIST].y < 0.3;
             if (isThumbAsideAyuda && isIndexFoldedAyuda && isMiddleFoldedAyuda && isRingFoldedAyuda && isPinkyFoldedAyuda && isPalmUpAyuda && isNearChestAyuda) {
                 debugSignInfo.push('Detected Ayuda');
                 return 'saludo_ayuda';
@@ -522,221 +546,236 @@
                 debugSignInfo.push(`Ayuda failed: ThumbAside=${isThumbAsideAyuda}, IndexFolded=${isIndexFoldedAyuda}, MiddleFolded=${isMiddleFoldedAyuda}, RingFolded=${isRingFoldedAyuda}, PinkyFolded=${isPinkyFoldedAyuda}, PalmUp=${isPalmUpAyuda}, NearChest=${isNearChestAyuda}`);
             }
 
+            // Buenos días: Both hands in B shape, near chest, palms facing outward
+            const isLeftHandB = isThumbFoldedB && isIndexExtendedB && isMiddleExtendedB && isRingExtendedB && isPinkyExtendedB;
+            const isRightHandB = isThumbFoldedB && isIndexExtendedB && isMiddleExtendedB && isRingExtendedB && isPinkyExtendedB;
+            const isNearChestBuenosDias = smoothed[WRIST].y > -0.2 && smoothed[WRIST].y < 0.2;
+            const isPalmOutwardBuenosDias = smoothed[THUMB_TIP].x > smoothed[PINKY_TIP].x;
+            if (isLeftHandB && isRightHandB && isNearChestBuenosDias && isPalmOutwardBuenosDias) {
+                debugSignInfo.push('Detected Buenos días');
+                return 'saludo_buenos_dias';
+            } else {
+                debugSignInfo.push(`Buenos días failed: LeftHandB=${isLeftHandB}, RightHandB=${isRightHandB}, NearChest=${isNearChestBuenosDias}, PalmOutward=${isPalmOutwardBuenosDias}`);
+            }
+
+            // Familia: Both hands in F shape, crossed near chest
+            const isThumbIndexCircleFamilia = distanciaEuclidiana(smoothed[THUMB_TIP], smoothed[INDEX_TIP]) < 0.06;
+            const isMiddleFoldedFamilia = estaDedoDoblado(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]);
+            const isRingFoldedFamilia = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP]);
+            const isPinkyFoldedFamilia = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP]);
+            const isCrossedFamilia = smoothed[THUMB_TIP].x < smoothed[INDEX_MCP].x - 0.1;
+            const isNearChestFamilia = smoothed[WRIST].y > -0.3 && smoothed[WRIST].y < 0.3;
+            if (isThumbIndexCircleFamilia && isMiddleFoldedFamilia && isRingFoldedFamilia && isPinkyFoldedFamilia && isCrossedFamilia && isNearChestFamilia) {
+                debugSignInfo.push('Detected Familia');
+                return 'familia';
+            } else {
+                debugSignInfo.push(`Familia failed: ThumbIndexCircle=${isThumbIndexCircleFamilia}, MiddleFolded=${isMiddleFoldedFamilia}, RingFolded=${isRingFoldedFamilia}, PinkyFolded=${isPinkyFoldedFamilia}, Crossed=${isCrossedFamilia}, NearChest=${isNearChestFamilia}`);
+            }
+
+            // Amigo: A shape, palm up, near shoulder
+            const isThumbAsideAmigo = smoothed[THUMB_TIP].x > smoothed[INDEX_MCP].x + 0.02;
+            const isIndexFoldedAmigo = estaDedoDoblado(smoothed[INDEX_TIP], smoothed[INDEX_MCP]);
+            const isMiddleFoldedAmigo = estaDedoDoblado(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]);
+            const isRingFoldedAmigo = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP]);
+            const isPinkyFoldedAmigo = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP]);
+            const isPalmUpAmigo = smoothed[INDEX_TIP].z < smoothed[WRIST].z;
+            const isNearShoulderAmigo = smoothed[WRIST].y < 0.1 && smoothed[WRIST].y > -0.1;
+            if (isThumbAsideAmigo && isIndexFoldedAmigo && isMiddleFoldedAmigo && isRingFoldedAmigo && isPinkyFoldedAmigo && isPalmUpAmigo && isNearShoulderAmigo) {
+                debugSignInfo.push('Detected Amigo');
+                return 'amigo';
+            } else {
+                debugSignInfo.push(`Amigo failed: ThumbAside=${isThumbAsideAmigo}, IndexFolded=${isIndexFoldedAmigo}, MiddleFolded=${isMiddleFoldedAmigo}, RingFolded=${isRingFoldedAmigo}, PinkyFolded=${isPinkyFoldedAmigo}, PalmUp=${isPalmUpAmigo}, NearShoulder=${isNearShoulderAmigo}`);
+            }
+
+            // Amor: Crossed arms with both hands in A shape
+            const isLeftThumbAsideAmor = smoothed[THUMB_TIP].x > smoothed[INDEX_MCP].x + 0.02;
+            const isLeftIndexFoldedAmor = estaDedoDoblado(smoothed[INDEX_TIP], smoothed[INDEX_MCP]);
+            const isLeftMiddleFoldedAmor = estaDedoDoblado(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]);
+            const isLeftRingFoldedAmor = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP]);
+            const isLeftPinkyFoldedAmor = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP]);
+            const isRightThumbAsideAmor = smoothed[THUMB_TIP].x < smoothed[INDEX_MCP].x - 0.02;
+            const isRightIndexFoldedAmor = estaDedoDoblado(smoothed[INDEX_TIP], smoothed[INDEX_MCP]);
+            const isRightMiddleFoldedAmor = estaDedoDoblado(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]);
+            const isRightRingFoldedAmor = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP]);
+            const isRightPinkyFoldedAmor = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP]);
+            if (isLeftThumbAsideAmor && isLeftIndexFoldedAmor && isLeftMiddleFoldedAmor && isLeftRingFoldedAmor && isLeftPinkyFoldedAmor &&
+                isRightThumbAsideAmor && isRightIndexFoldedAmor && isRightMiddleFoldedAmor && isRightRingFoldedAmor && isRightPinkyFoldedAmor) {
+                debugSignInfo.push('Detected Amor');
+                return 'amor';
+            } else {
+                debugSignInfo.push(`Amor failed: LeftThumbAside=${isLeftThumbAsideAmor}, LeftIndexFolded=${isLeftIndexFoldedAmor}, LeftMiddleFolded=${isLeftMiddleFoldedAmor}, LeftRingFolded=${isLeftRingFoldedAmor}, LeftPinkyFolded=${isLeftPinkyFoldedAmor}, RightThumbAside=${isRightThumbAsideAmor}, RightIndexFolded=${isRightIndexFoldedAmor}, RightMiddleFolded=${isRightMiddleFoldedAmor}, RightRingFolded=${isRightRingFoldedAmor}, RightPinkyFolded=${isRightPinkyFoldedAmor}`);
+            }
+
+            // Trabajo: W shape, palm down
+            const isIndexExtendedTrabajo = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP]);
+            const isMiddleExtendedTrabajo = estaDedoExtendido(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]);
+            const isRingFoldedTrabajo = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP]);
+            const isPinkyFoldedTrabajo = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP]);
+            const isThumbFoldedTrabajo = distanciaEuclidiana(smoothed[THUMB_TIP], smoothed[PINKY_MCP]) < 0.10;
+            const isPalmDownTrabajo = smoothed[INDEX_TIP].z > smoothed[WRIST].z;
+            if (isIndexExtendedTrabajo && isMiddleExtendedTrabajo && isRingFoldedTrabajo && isPinkyFoldedTrabajo && isThumbFoldedTrabajo && isPalmDownTrabajo) {
+                debugSignInfo.push('Detected Trabajo');
+                return 'trabajo';
+            } else {
+                debugSignInfo.push(`Trabajo failed: IndexExtended=${isIndexExtendedTrabajo}, MiddleExtended=${isMiddleExtendedTrabajo}, RingFolded=${isRingFoldedTrabajo}, PinkyFolded=${isPinkyFoldedTrabajo}, ThumbFolded=${isThumbFoldedTrabajo}, PalmDown=${isPalmDownTrabajo}`);
+            }
+
+            // Viaje: V shape, palm outward
+            const isIndexExtendedViaje = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP]);
+            const isMiddleExtendedViaje = estaDedoExtendido(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]);
+            const isRingFoldedViaje = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP]);
+            const isPinkyFoldedViaje = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP]);
+            const isThumbFoldedViaje = distanciaEuclidiana(smoothed[THUMB_TIP], smoothed[PINKY_MCP]) < 0.10;
+            const isPalmOutwardViaje = smoothed[THUMB_TIP].x > smoothed[PINKY_TIP].x;
+            if (isIndexExtendedViaje && isMiddleExtendedViaje && isRingFoldedViaje && isPinkyFoldedViaje && isThumbFoldedViaje && isPalmOutwardViaje) {
+                debugSignInfo.push('Detected Viaje');
+                return 'viaje';
+            } else {
+                debugSignInfo.push(`Viaje failed: IndexExtended=${isIndexExtendedViaje}, MiddleExtended=${isMiddleExtendedViaje}, RingFolded=${isRingFoldedViaje}, PinkyFolded=${isPinkyFoldedViaje}, ThumbFolded=${isThumbFoldedViaje}, PalmOutward=${isPalmOutwardViaje}`);
+            }
+
+            // Comida: C shape, near mouth
+            const thumbIndexDistComida = distanciaEuclidiana(smoothed[THUMB_TIP], smoothed[INDEX_TIP]);
+            const isCFingerShapeComida = thumbIndexDistComida > 0.06 && thumbIndexDistComida < 0.20;
+            const isMiddleCurvedComida = distanciaEuclidiana(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]) > 0.03 && distanciaEuclidiana(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]) < 0.10;
+            const isNearMouthComida = smoothed[WRIST].y < 0.1 && smoothed[WRIST].y > -0.2;
+            if (isCFingerShapeComida && isMiddleCurvedComida && isNearMouthComida) {
+                debugSignInfo.push('Detected Comida');
+                return 'comida';
+            } else {
+                debugSignInfo.push(`Comida failed: CFingerShape=${isCFingerShapeComida}, MiddleCurved=${isMiddleCurvedComida}, NearMouth=${isNearMouthComida}`);
+            }
+
+            // Agua: W shape, palm up
+            const isIndexExtendedAgua = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP]);
+            const isMiddleExtendedAgua = estaDedoExtendido(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]);
+            const isRingFoldedAgua = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP]);
+            const isPinkyFoldedAgua = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP]);
+            const isThumbFoldedAgua = distanciaEuclidiana(smoothed[THUMB_TIP], smoothed[PINKY_MCP]) < 0.10;
+            const isPalmUpAgua = smoothed[INDEX_TIP].z < smoothed[WRIST].z;
+            if (isIndexExtendedAgua && isMiddleExtendedAgua && isRingFoldedAgua && isPinkyFoldedAgua && isThumbFoldedAgua && isPalmUpAgua) {
+                debugSignInfo.push('Detected Agua');
+                return 'agua';
+            } else {
+                debugSignInfo.push(`Agua failed: IndexExtended=${isIndexExtendedAgua}, MiddleExtended=${isMiddleExtendedAgua}, RingFolded=${isRingFoldedAgua}, PinkyFolded=${isPinkyFoldedAgua}, ThumbFolded=${isThumbFoldedAgua}, PalmUp=${isPalmUpAgua}`);
+            }
+
+            // Sol: Circle with thumb and index, palm outward
+            const isThumbIndexCircleSol = distanciaEuclidiana(smoothed[THUMB_TIP], smoothed[INDEX_TIP]) < 0.06;
+            const isMiddleFoldedSol = estaDedoDoblado(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]);
+            const isRingFoldedSol = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP]);
+            const isPinkyFoldedSol = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP]);
+            const isPalmOutwardSol = smoothed[THUMB_TIP].x > smoothed[PINKY_TIP].x;
+            if (isThumbIndexCircleSol && isMiddleFoldedSol && isRingFoldedSol && isPinkyFoldedSol && isPalmOutwardSol) {
+                debugSignInfo.push('Detected Sol');
+                return 'sol';
+            } else {
+                debugSignInfo.push(`Sol failed: ThumbIndexCircle=${isThumbIndexCircleSol}, MiddleFolded=${isMiddleFoldedSol}, RingFolded=${isRingFoldedSol}, PinkyFolded=${isPinkyFoldedSol}, PalmOutward=${isPalmOutwardSol}`);
+            }
+
             console.log('[DEBUG] Sign detection:\n' + debugSignInfo.join('\n'));
             return null;
         }
 
         function startCamera() {
-            if (cameraInstance) {
-                console.log('[DEBUG] Camera already running');
-                return;
-            }
-
             const video = document.getElementById('video');
             const canvas = document.getElementById('canvas');
             const status = document.getElementById('status');
             const gesture = document.getElementById('gesture');
-            const errorMessage = document.getElementById('errorMessage');
-            const debugMessage = document.getElementById('debugMessage');
-            const videoContainer = document.getElementById('videoContainer');
-
-            if (!video || !canvas || !status || !gesture || !errorMessage || !debugMessage || !videoContainer) {
-                console.error('[ERROR] Missing DOM elements for camera');
-                errorMessage.textContent = 'Error: Elementos de la interfaz no encontrados.';
-                errorMessage.classList.remove('hidden');
-                return;
-            }
-
-            currentVideo = video;
             const canvasCtx = canvas.getContext('2d');
 
             handsInstance = new Hands({
                 locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1646424915/${file}`
             });
-
             handsInstance.setOptions({
-                maxNumHands: 2,
-                modelComplexity: 0,
-                minDetectionConfidence: 0.6,
-                minTrackingConfidence: 0.6
+                maxNumHands: 2, modelComplexity: 0, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6
             });
 
-            handsInstance.onResults(async (results) => {
-                const currentTime = performance.now();
-                if (currentTime - lastFrameTime < FRAME_INTERVAL) {
-                    return;
-                }
-                lastFrameTime = currentTime;
-
-                canvasCtx.save();
+            handsInstance.onResults((results) => {
                 canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
                 canvasCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
                 let detectedSign = null;
-                let debugInfo = [];
-
-                try {
-                    if (results.multiHandLandmarks && results.multiHandedness) {
-                        videoContainer.classList.add('hands-detected');
-                        status.textContent = 'Manos detectadas';
-                        status.classList.remove('blink');
-
-                        for (let i = 0; i < results.multiHandLandmarks.length; i++) {
-                            const landmarks = results.multiHandLandmarks[i];
-                            const handedness = results.multiHandedness[i];
-                            drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, { color: '#34d399', lineWidth: 5 });
-                            drawLandmarks(canvasCtx, landmarks, { color: '#a855f7', lineWidth: 2 });
-
-                            let sign = detectLSMSign(landmarks);
-                            if (sign && sign.startsWith('saludo_')) {
-                                sign = sign.replace('saludo_', '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                            }
-                            if (sign && !INAPPROPRIATE_SIGNS.includes(sign)) {
-                                detectionHistory.push(sign);
-                                if (detectionHistory.length > DETECTION_HISTORY_SIZE) {
-                                    detectionHistory.shift();
-                                }
-                                const mostCommonSign = detectionHistory
-                                    .sort((a, b) =>
-                                        detectionHistory.filter(v => v === a).length -
-                                        detectionHistory.filter(v => v === b).length
-                                    )
-                                    .pop();
-                                if (detectionHistory.filter(v => v === mostCommonSign).length >= DETECTION_HISTORY_SIZE * 0.6) {
-                                    detectedSign = mostCommonSign;
-                                }
-                                debugInfo.push(`Mano ${i + 1} (${handedness.label}): ${sign}`);
-                            } else {
-                                detectionHistory.push(null);
-                                if (detectionHistory.length > DETECTION_HISTORY_SIZE) {
-                                    detectionHistory.shift();
-                                }
-                                debugInfo.push(`Mano ${i + 1} (${handedness.label}): No detectada`);
-                            }
-                        }
-                    } else {
-                        videoContainer.classList.remove('hands-detected');
-                        status.textContent = 'No se detectan manos';
-                        status.classList.add('blink');
-                        detectionHistory.push(null);
-                        if (detectionHistory.length > DETECTION_HISTORY_SIZE) {
-                            detectionHistory.shift();
-                        }
-                        debugInfo.push('No se detectaron manos');
+                if (results.multiHandLandmarks && results.multiHandedness) {
+                    status.textContent = 'Manos detectadas';
+                    for (let i = 0; i < results.multiHandLandmarks.length; i++) {
+                        const landmarks = results.multiHandLandmarks[i];
+                        drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, { color: '#34d399', lineWidth: 5 });
+                        drawLandmarks(canvasCtx, landmarks, { color: '#a855f7', lineWidth: 2 });
+                        let sign = detectLSMSign(landmarks);
+                        if (sign && sign.startsWith('saludo_')) sign = sign.replace('saludo_', '');
+                        if (sign) detectedSign = sign;
                     }
-                } catch (generalError) {
-                    console.error('[ERROR] Error general en onResults:', generalError);
-                    errorMessage.textContent = 'Error al procesar el frame';
-                    errorMessage.classList.remove('hidden');
+                } else {
+                    status.textContent = 'No se detectan manos';
                 }
-
-                canvasCtx.restore();
 
                 if (detectedSign && detectedSign !== lastDetectedSign && sePuedeDetectar) {
-                    gesture.textContent = `Seña detectada: ${detectedSign}`;
-                    debugMessage.textContent = debugInfo.join('\n');
-                    debugMessage.classList.remove('hidden');
-
                     if ('speechSynthesis' in window && selectedVoice) {
-                        try {
-                            const utterance = new SpeechSynthesisUtterance(detectedSign);
-                            utterance.voice = selectedVoice;
-                            utterance.lang = selectedVoice.lang || 'es-MX';
-                            utterance.volume = 1;
-                            utterance.rate = 1;
-                            utterance.pitch = 1;
-                            utterance.onend = () => {
-                                sePuedeDetectar = true;
-                                console.log('[DEBUG] Utterance ended, sePuedeDetectar reset to true');
-                            };
-                            utterance.onerror = (event) => {
-                                console.error('[ERROR] SpeechSynthesisUtterance error:', event.error);
-                                sePuedeDetectar = true;
-                            };
+                        const utterance = new SpeechSynthesisUtterance(detectedSign === 'te_veo' ? 'te veo' : detectedSign === 'amigo' ? 'amigo' : detectedSign);
+                        utterance.voice = selectedVoice;
+                        utterance.lang = selectedVoice.lang || 'es-MX';
+                        utterance.volume = 1.0;
+                        utterance.rate = 1.0;
+                        utterance.pitch = 1.0;
+                        utterance.onend = () => { sePuedeDetectar = true; };
+                        speechSynthesis.cancel();
+                        sePuedeDetectar = false;
+                        speechSynthesis.speak(utterance);
+                    } else if ('speechSynthesis' in window && !selectedVoice) {
+                        const utterance = new SpeechSynthesisUtterance(detectedSign === 'te_veo' ? 'te veo' : detectedSign === 'amigo' ? 'amigo' : detectedSign);
+                        const voices = speechSynthesis.getVoices();
+                        const defaultVoice = voices.find(v => v.lang.startsWith('es-')) || voices[0];
+                        if (defaultVoice) {
+                            utterance.voice = defaultVoice;
+                            utterance.lang = defaultVoice.lang || 'es-MX';
+                            utterance.volume = 1.0;
+                            utterance.rate = 1.0;
+                            utterance.pitch = 1.0;
+                            utterance.onend = () => { sePuedeDetectar = true; };
+                            speechSynthesis.cancel();
                             sePuedeDetectar = false;
                             speechSynthesis.speak(utterance);
-                            console.log(`[DEBUG] Speaking: ${detectedSign}, Voice: ${selectedVoice.name}, Lang: ${utterance.lang}`);
-                        } catch (speechError) {
-                            console.error('[ERROR] Failed to speak:', speechError);
-                            sePuedeDetectar = true;
-                            errorMessage.textContent = 'Error al reproducir la voz.';
-                            errorMessage.classList.remove('hidden');
                         }
-                    } else {
-                        console.warn('[DEBUG] SpeechSynthesis not ready or no voice selected');
-                        errorMessage.textContent = 'Síntesis de voz no disponible o voz no seleccionada.';
-                        errorMessage.classList.remove('hidden');
                     }
                     lastDetectedSign = detectedSign;
-                    ultimaSeña = detectedSign;
+                    gesture.innerHTML = `Seña detectada: ${detectedSign} <br> Traducción: ${SIGN_TRANSLATIONS[detectedSign] || 'No disponible'}`;
+                    setTimeout(() => { sePuedeDetectar = true; }, 1000);
                 } else if (!detectedSign) {
-                    gesture.textContent = 'Seña detectada: Ninguna';
-                    debugMessage.textContent = debugInfo.join('\n');
-                    debugMessage.classList.remove('hidden');
+                    gesture.innerHTML = 'Seña detectada: Ninguna <br> Traducción: -';
                 }
-
-                console.log('[DEBUG] Frame processed:\n' + debugInfo.join('\n'));
             });
 
-            navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'user', width: 640, height: 480 }
-            }).then(stream => {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 640, height: 480 } }).then(stream => {
                 video.srcObject = stream;
-                video.play().catch(err => {
-                    console.error('[ERROR] Failed to play video:', err);
-                    errorMessage.textContent = 'Error al reproducir el video. Verifica los permisos de la cámara.';
-                    errorMessage.classList.remove('hidden');
-                    status.textContent = 'Error en la cámara';
-                    status.classList.add('blink');
-                });
-
+                video.play();
                 video.onloadedmetadata = () => {
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
                     cameraInstance = new Camera(video, {
-                        onFrame: async () => {
-                            await handsInstance.send({ image: video });
-                        },
-                        width: video.videoWidth,
-                        height: video.videoHeight
+                        onFrame: async () => await handsInstance.send({ image: video }),
+                        width: video.videoWidth, height: video.videoHeight
                     });
                     cameraInstance.start();
                     status.textContent = 'Cámara iniciada';
-                    console.log('[DEBUG] Camera started with resolution ' + video.videoWidth + 'x' + video.videoHeight);
+                    if ('speechSynthesis' in window) {
+                        const utterance = new SpeechSynthesisUtterance('Iniciando');
+                        utterance.volume = 0;
+                        speechSynthesis.speak(utterance);
+                    }
                 };
-            }).catch(err => {
-                console.error('[ERROR] Camera access denied:', err);
-                errorMessage.textContent = 'No se pudo acceder a la cámara. Por favor, permite el acceso.';
-                errorMessage.classList.remove('hidden');
-                status.textContent = 'Error: Cámara no disponible';
-                status.classList.add('blink');
             });
         }
 
         function stopCamera() {
-            if (cameraInstance) {
-                cameraInstance.stop();
-                cameraInstance = null;
-                console.log('[DEBUG] Camera stopped');
-            }
+            if (cameraInstance) cameraInstance.stop();
             if (currentVideo && currentVideo.srcObject) {
-                const stream = currentVideo.srcObject;
-                const tracks = stream.getTracks();
-                tracks.forEach(track => track.stop());
+                currentVideo.srcObject.getTracks().forEach(track => track.stop());
                 currentVideo.srcObject = null;
-                console.log('[DEBUG] Video stream stopped');
             }
-            if (handsInstance) {
-                handsInstance.close();
-                handsInstance = null;
-                console.log('[DEBUG] Hands instance closed');
-            }
-            landmarkHistory = [];
-            smoothedLandmarks = [];
-            detectionHistory = [];
+            if (handsInstance) handsInstance.close();
             lastDetectedSign = null;
             sePuedeDetectar = true;
-            ultimaSeña = null;
         }
 
         function clearScreen() {
@@ -836,10 +875,8 @@
                         <select id="voiceSelect" class="combobox mt-2">
                             <option value="" disabled selected>Elige una voz</option>
                         </select>
-                        <button id="testVoiceButton" class="test-voice-button">Probar Voz</button>
-                        <button id="initSpeechButton" class="test-voice-button mt-2">Inicializar Voz</button>
                         <p id="status" class="status-text mt-4">Iniciando cámara...</p>
-                        <p id="gesture" class="status-text mt-2">Seña detectada: Ninguna</p>
+                        <p id="gesture" class="status-text mt-2">Seña detectada: Ninguna <br> Traducción: -</p>
                         <div id="errorMessage" class="error-message hidden mt-4"></div>
                         <div id="debugMessage" class="debug-text hidden mt-4"></div>
                     </div>
@@ -847,35 +884,6 @@
             `;
             document.getElementById('backToMenu').addEventListener('click', renderMainScreen);
             document.getElementById('userButton').addEventListener('click', renderUserScreen);
-            document.getElementById('testVoiceButton').addEventListener('click', () => {
-                if ('speechSynthesis' in window) {
-                    const utterance = new SpeechSynthesisUtterance('Prueba de voz');
-                    utterance.voice = selectedVoice;
-                    utterance.lang = selectedVoice ? selectedVoice.lang : 'es-MX';
-                    utterance.volume = 1;
-                    utterance.rate = 1;
-                    utterance.pitch = 1;
-                    speechSynthesis.speak(utterance);
-                    console.log('[DEBUG] Test voice triggered');
-                } else {
-                    const errorMessage = document.getElementById('errorMessage');
-                    errorMessage.textContent = 'Síntesis de voz no soportada en este navegador.';
-                    errorMessage.classList.remove('hidden');
-                }
-            });
-            document.getElementById('initSpeechButton').addEventListener('click', () => {
-                if ('speechSynthesis' in window) {
-                    const utterance = new SpeechSynthesisUtterance('');
-                    utterance.volume = 0; // Silencioso para no molestar
-                    speechSynthesis.speak(utterance);
-                    console.log('[DEBUG] SpeechSynthesis initialized');
-                    const errorMessage = document.getElementById('errorMessage');
-                    errorMessage.textContent = 'Voz inicializada correctamente.';
-                    errorMessage.classList.remove('hidden', 'error-message');
-                    errorMessage.classList.add('text-green-500');
-                    setTimeout(() => errorMessage.classList.add('hidden'), 2000);
-                }
-            });
             populateVoiceSelect();
             startCamera();
             console.log('[DEBUG] Traducción screen rendered');
@@ -1089,59 +1097,58 @@
                     { name: 'Letra Z', path: `${basePath}letra_Z.jpg` }
                 ],
                 animales: [
-                    { name: 'Vaca', path: `${basePath}vaca.jpg` },
-                    { name: 'Lobo', path: `${basePath}lobo.jpg` },
-                    { name: 'Jirafa', path: `${basePath}jirafa.jpg` },
-                    { name: 'Tiburón', path: `${basePath}tiburon.jpg` },
-                    { name: 'Perro', path: `${basePath}perro.jpg` },
-                    { name: 'Gato', path: `${basePath}gato.jpg` },
-                    { name: 'Puerco', path: `${basePath}puerco.jpg` },
-                    { name: 'Rinoceronte', path: `${basePath}rinoceronte.jpg` },
-                    { name: 'Serpiente', path: `${basePath}serpiente.jpg` },
-                    { name: 'Tigre', path: `${basePath}tigre.jpg` },
-                    { name: 'Toro', path: `${basePath}toro.jpg` },
-                    { name: 'Libélula', path: `${basePath}libelula.jpg` },
-                    { name: 'Lagarto', path: `${basePath}lagarto.jpg` },
-                    { name: 'Gorila', path: `${basePath}gorila.jpg` },
-                    { name: 'Foca', path: `${basePath}foca.jpg` }
+                    { name: 'animal_leon.jpg', path: `${basePath}animal_leon.jpg` },
+                    { name: 'animal_ballena.jpg', path: `${basePath}animal_ballena.jpg` },
+                    { name: 'animal_caballo.jpg', path: `${basePath}animal_caballo.jpg` },
+                    { name: 'animal_cebra.jpg', path: `${basePath}animal_cebra.jpg` },
+                    { name: 'animal_elefante.jpg', path: `${basePath}animal_elefante.jpg` },
+                    { name: 'animal_foca.jpg', path: `${basePath}animal_foca.jpg` },
+                    { name: 'animal_gorila.jpg', path: `${basePath}animal_gorila.jpg` },
+                    { name: 'animal_jirafa.jpg', path: `${basePath}animal_jirafa.jpg` },
+                    { name: 'animal_lagarto.jpg', path: `${basePath}animal_lagarto.jpg` },
+                    { name: 'animal_lobo.jpg', path: `${basePath}animal_lobo.jpg` },
+                    { name: 'animal_puerco.jpg', path: `${basePath}animal_puerco.jpg` },
+                    { name: 'animal_serpiente.jpg', path: `${basePath}animal_serpiente.jpg` },
+                    { name: 'animal_tigre.jpg', path: `${basePath}animal_tigre.jpg` },
+                    { name: 'animal_vaca.jpg', path: `${basePath}animal_vaca.jpg` },
+                    { name: 'animal_pavo_real.jpg', path: `${basePath}animal_pavo_real.jpg` }
                 ],
                 casa: [
-                    { name: 'Almohada', path: `${basePath}almohada.jpg` },
-                    { name: 'Azotea', path: `${basePath}azotea.jpg` },
-                    { name: 'Azúcarera', path: `${basePath}azucarera.jpg` },
-                    { name: 'Baño', path: `${basePath}baño.jpg` },
-                    { name: 'Barrer', path: `${basePath}barrer.jpg` },
-                    { name: 'Batidora', path: `${basePath}batidora.jpg` },
-                    { name: 'Bote', path: `${basePath}bote.jpg` },
-                    { name: 'Buzón', path: `${basePath}buzon.jpg` },
-                    { name: 'Cacerola', path: `${basePath}cacerola.jpg` },
-                    { name: 'Cajón', path: `${basePath}cajon.jpg` },
-                    { name: 'Cama', path: `${basePath}cama.jpg` },
-                    { name: 'Candelero', path: `${basePath}candelero.jpg` },
-                    { name: 'Casa', path: `${basePath}casa.jpg` },
-                    { name: 'Cazuela', path: `${basePath}cazuela.jpg` },
-                    { name: 'Cepillo de dientes', path: `${basePath}cepillo_dientes.jpg` },
-                    { name: 'Cepillo de pelo', path: `${basePath}cepillo_pelo.jpg` },
-                    { name: 'Champú', path: `${basePath}champu.jpg` },
-                    { name: 'Charola', path: `${basePath}charola.jpg` },
-                    { name: 'Chupón', path: `${basePath}chupon.jpg` },
-                    { name: 'Cobertor', path: `${basePath}cobertor.jpg` },
-                    { name: 'Coladera', path: `${basePath}coladera.jpg` },
-                    { name: 'Colcha', path: `${basePath}colcha.jpg` },
-                    { name: 'Colador', path: `${basePath}colador.jpg` },
-                    { name: 'Comal', path: `${basePath}comal.jpg` },
-                    { name: 'Comedor', path: `${basePath}comedor.jpg` },
-                    { name: 'Cómoda', path: `${basePath}comoda.jpg` },
-                    { name: 'Condominio', path: `${basePath}condominio.jpg` },
-                    { name: 'Copa', path: `${basePath}copa.jpg` },
-                    { name: 'Corredor', path: `${basePath}corredor.jpg` },
-                    { name: 'Corriente', path: `${basePath}corriente.jpg` },
-                    { name: 'Cortina', path: `${basePath}cortina.jpg` },
-                    { name: 'Cuarto', path: `${basePath}cuarto.jpg` },
-                    { name: 'Cuchara', path: `${basePath}cuchara.jpg` },
-                    { name: 'Cuchillo', path: `${basePath}cuchillo.jpg` },
-                    { name: 'Departamento', path: `${basePath}departamento.jpg` },
-                    { name: 'Destapador', path: `${basePath}destapador.jpg` }
+                    { name: 'Captura de pantalla 2025-04-110 122451.png', path: `${basePath}Captura de pantalla 2025-04-110 122451.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122458.png', path: `${basePath}Captura de pantalla 2025-04-110 122458.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122503.png', path: `${basePath}Captura de pantalla 2025-04-110 122503.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122507.png', path: `${basePath}Captura de pantalla 2025-04-110 122507.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122511.png', path: `${basePath}Captura de pantalla 2025-04-110 122511.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122518.png', path: `${basePath}Captura de pantalla 2025-04-110 122518.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122523.png', path: `${basePath}Captura de pantalla 2025-04-110 122523.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122534.png', path: `${basePath}Captura de pantalla 2025-04-110 122534.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122541.png', path: `${basePath}Captura de pantalla 2025-04-110 122541.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122545.png', path: `${basePath}Captura de pantalla 2025-04-110 122545.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122549.png', path: `${basePath}Captura de pantalla 2025-04-110 122549.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122553.png', path: `${basePath}Captura de pantalla 2025-04-110 122553.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122557.png', path: `${basePath}Captura de pantalla 2025-04-110 122557.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122601.png', path: `${basePath}Captura de pantalla 2025-04-110 122601.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122608.png', path: `${basePath}Captura de pantalla 2025-04-110 122608.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122619.png', path: `${basePath}Captura de pantalla 2025-04-110 122619.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122623.png', path: `${basePath}Captura de pantalla 2025-04-110 122623.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122627.png', path: `${basePath}Captura de pantalla 2025-04-110 122627.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122631.png', path: `${basePath}Captura de pantalla 2025-04-110 122631.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122637.png', path: `${basePath}Captura de pantalla 2025-04-110 122637.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122640.png', path: `${basePath}Captura de pantalla 2025-04-110 122640.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122644.png', path: `${basePath}Captura de pantalla 2025-04-110 122644.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122648.png', path: `${basePath}Captura de pantalla 2025-04-110 122648.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122652.png', path: `${basePath}Captura de pantalla 2025-04-110 122652.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122659.png', path: `${basePath}Captura de pantalla 2025-04-110 122659.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122703.png', path: `${basePath}Captura de pantalla 2025-04-110 122703.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122706.png', path: `${basePath}Captura de pantalla 2025-04-110 122706.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122710.png', path: `${basePath}Captura de pantalla 2025-04-110 122710.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122715.png', path: `${basePath}Captura de pantalla 2025-04-110 122715.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122719.png', path: `${basePath}Captura de pantalla 2025-04-110 122719.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122726.png', path: `${basePath}Captura de pantalla 2025-04-110 122726.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122730.png', path: `${basePath}Captura de pantalla 2025-04-110 122730.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122734.png', path: `${basePath}Captura de pantalla 2025-04-110 122734.png` },
+                    { name: 'Captura de pantalla 2025-04-110 122739.png', path: `${basePath}Captura de pantalla 2025-04-110 122739.png` },
+                    
                 ],
                 colores: [
                     { name: 'Naranja', path: `${basePath}naranja.jpg` },
@@ -1238,7 +1245,8 @@
                     { name: 'Adiós', path: `${basePath}saludo_adios.jpg` },
                     { name: 'Cómo estás', path: `${basePath}saludo_como_estas.jpg` },
                     { name: 'Comparte', path: `${basePath}saludo_comparte.jpg` },
-                    { name: 'Ayuda', path: `${basePath}saludo_ayuda.jpg` }
+                    { name: 'Ayuda', path: `${basePath}saludo_ayuda.jpg` },
+                    { name: 'Buenos días', path: `${basePath}saludo_buenos_dias.jpg` }
                 ],
                 groserias: [
                     { name: 'Tonto', path: `${basePath}groseria_tonto.jpg` },
@@ -1281,3 +1289,7 @@
     </script>
 </body>
 </html>
+
+
+
+
