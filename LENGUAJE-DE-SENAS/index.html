@@ -1,181 +1,26 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aprende Lengua de Señas</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1640029074/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1646424915/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3.1620248257/drawing_utils.js" crossorigin="anonymous"></script>
     <style>
-
         body {
-            font-family: 'Poppins', sans-serif;
-            color: #fff;
-            min-height: 100vh;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom, #1a202c, #2d3748);
+            color: white;
             overflow-x: hidden;
-            position: relative;
         }
         #starfield {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
             z-index: -1;
-            background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
-        }
-        .main-button {
-            background: linear-gradient(45deg, #a855f7, #ec4899);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 10px;
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin: 10px;
-            transition: transform 0.3s ease;
-        }
-        .main-button:hover {
-            transform: scale(1.05);
-        }
-        .back-button, .user-button {
-            background: linear-gradient(45deg, #a855f7, #ec4899);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-        .card {
-            background: linear-gradient(45deg, #1e40af, #3b82f6);
-            border-radius: 15px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s ease;
-            padding: 20px;
-        }
-        .card:hover {
-            transform: scale(1.03);
-        }
-        .carousel-container {
-            position: relative;
-            width: 100%;
-            max-width: 800px;
-            margin: 20px auto;
-            overflow: hidden;
-            border-radius: 15px;
-        }
-        .carousel {
-            display: flex;
-            transition: transform 0.5s ease-in-out;
-        }
-        .carousel-item {
-            flex: 0 0 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(45deg, #1e40af, #3b82f6);
-            padding: 20px;
-        }
-        .carousel-item img {
-            width: 100%;
-            max-width: 600px;
-            height: auto;
-            max-height: 400px;
-            object-fit: contain;
-            border-radius: 10px;
-        }
-        .carousel-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.5);
-            color: #fff;
-            font-size: 2rem;
-            padding: 10px 15px;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-        .carousel-nav:hover {
-            background: rgba(0, 0, 0, 0.8);
-        }
-        .prev { left: 10px; }
-        .next { right: 10px; }
-        .status-text {
-            font-size: 1.25rem;
-            margin-top: 10px;
-        }
-        .error-message {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 15px;
-        }
-        .debug-text {
-            background: rgba(52, 211, 153, 0.1);
-            color: #34d399;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 15px;
-        }
-        .video-container {
-            position: relative;
-            max-width: 640px;
-            margin: 0 auto;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-            background: linear-gradient(45deg, #a855f7, #ec4899);
-            padding: 10px;
-        }
-        .video-container.hands-detected {
-            border: 4px solid #34d399;
-        }
-        video {
-            width: 100%;
-            height: auto;
-            border-radius: 10px;
-        }
-        canvas {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            width: calc(100% - 20px);
-            height: calc(100% - 20px);
-            border-radius: 10px;
-        }
-        .combobox {
-            background: #1e40af;
-            border: 8px solid #a855f7;
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            width: 100%;
-            max-width: 300px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-        .combobox:focus {
-            border-color: #ec4899;
-            outline: none;
-        }
-        .blink {
-            animation: blink 1s infinite;
-        }
-        @keyframes blink {
-            50% { opacity: 0; }
-        }
-        .option-button {
-            background: linear-gradient(45deg, #a855f7, #ec4899);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 10px;
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin: 10px;
-            transition: transform 0.3s ease;
-        }
-        .option-button:hover {
-            transform: scale(1.05);
         }
         .modal {
             position: fixed;
@@ -183,18 +28,18 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             display: flex;
-            align-items: center;
             justify-content: center;
-            z-index: 50;
+            align-items: center;
+            z-index: 1000;
         }
         .modal-content {
-            background: linear-gradient(45deg, #1e40af, #3b82f6);
-            padding: 20px;
-            border-radius: 15px;
+            background: #2d3748;
+            padding: 2rem;
+            border-radius: 0.5rem;
             text-align: center;
-            max-width: 400px;
+            max-width: 500px;
             width: 90%;
         }
         .modal-content img {
@@ -202,37 +47,147 @@
             height: 100px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid #a855f7;
-            margin-bottom: 10px;
+            margin-bottom: 1rem;
         }
         .modal-content input[type="text"] {
-            background: #1e40af;
-            border: 2px solid #a855f7;
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
             width: 100%;
-            max-width: 300px;
-            font-size: 1rem;
-            margin-bottom: 10px;
-        }
-        .modal-content input[type="text"]:focus {
-            border-color: #ec4899;
-            outline: none;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border-radius: 0.25rem;
+            border: 1px solid #4a5568;
+            background: #1a202c;
+            color: white;
         }
         .modal-content input[type="file"] {
-            margin: 10px 0;
+            margin-bottom: 1rem;
+        }
+        .video-container {
+            position: relative;
+            max-width: 640px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        .video-container.hands-detected video {
+            filter: brightness(1);
+        }
+        video, canvas {
+            width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .status-text {
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+        .blink {
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .error-message {
+            color: #f56565;
+            font-weight: bold;
+        }
+        .debug-text {
+            font-size: 0.875rem;
+            color: #a0aec0;
+            white-space: pre-wrap;
+        }
+        .option-button {
+            background: linear-gradient(to right, #a855f7, #ec4899);
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+        .option-button:hover {
+            transform: scale(1.05);
+        }
+        .card {
+            background: #2d3748;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .category-button {
+            background: #4a5568;
+            padding: 0.75rem;
+            font-size: 1.1rem;
+        }
+        .carousel-container {
+            position: relative;
+            max-width: 100%;
+            overflow: hidden;
+        }
+        .carousel {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+        .carousel-item {
+            flex: 0 0 100%;
+            text-align: center;
+        }
+        .carousel-item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+        }
+        .carousel-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
             color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+        .carousel-nav.prev { left: 10px; }
+        .carousel-nav.next { right: 10px; }
+        .back-button {
+            background: #4a5568;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            font-weight: bold;
+        }
+        .user-button {
+            background: linear-gradient(to right, #4c51bf, #667eea);
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            font-weight: bold;
+        }
+        .combobox {
+            background: #1a202c;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            border: 1px solid #4a5568;
+        }
+        .header-logo {
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+        }
+        .animate-fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1640029074/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1646424915/hands.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3.1620248257/drawing_utils.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <canvas id="starfield"></canvas>
-    <div id="app" class="container mx-auto p-6"></div>
-
+    <div id="app"></div>
     <script>
         console.log('[DEBUG] Script started at ' + new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }));
 
@@ -260,7 +215,6 @@
 
         function animateStarsAndMoon() {
             ctxStarfield.clearRect(0, 0, starfield.width, starfield.height);
-            // Draw stars
             ctxStarfield.fillStyle = 'white';
             stars.forEach(star => {
                 ctxStarfield.beginPath();
@@ -269,7 +223,6 @@
                 star.y += star.speed;
                 if (star.y > starfield.height) star.y = 0;
             });
-            // Draw moon with glow
             moon.phase += 0.01;
             moon.glow = 0.5 + Math.sin(moon.phase) * 0.2;
             ctxStarfield.beginPath();
@@ -283,13 +236,11 @@
             ctxStarfield.fillStyle = gradient;
             ctxStarfield.arc(moon.x, moon.y, moon.radius, 0, Math.PI * 2);
             ctxStarfield.fill();
-            // Moon craters
             ctxStarfield.fillStyle = 'rgba(200, 200, 200, 0.5)';
             ctxStarfield.beginPath();
             ctxStarfield.arc(moon.x - 10, moon.y - 5, 5, 0, Math.PI * 2);
             ctxStarfield.arc(moon.x + 8, moon.y + 5, 3, 0, Math.PI * 2);
             ctxStarfield.fill();
-            // Moon movement
             moon.x += Math.sin(moon.phase * 0.5) * 0.2;
             moon.y += Math.cos(moon.phase * 0.5) * 0.1;
             requestAnimationFrame(animateStarsAndMoon);
@@ -311,66 +262,70 @@
         let selectedVoice = null;
         let handsInstance = null;
         let lastFrameTime = 0;
-        const TARGET_FPS = 30;
+        const TARGET_FPS = 60;
         const FRAME_INTERVAL = 1000 / TARGET_FPS;
-        const INAPPROPRIATE_SIGNS = ['Pinche', 'Puto', 'Chinga', 'Pendejo', 'Cabrón', 'Inapropiado1', 'Inapropiado2'];
+        const INAPPROPRIATE_SIGNS = [
+            'Grosería (Tonto)', 'Grosería (Güey)', 'Grosería (Idiota)', 'Grosería (Puto)',
+            'Grosería (Mierda)', 'Grosería (Zorra)', 'Grosería (Pendejo)', 'Grosería (Verga)'
+        ];
         let sePuedeDetectar = true;
         let ultimaSeña = null;
-
-
-
-
-
-
-
-
+        let detectionHistory = [];
+        const DETECTION_HISTORY_SIZE = 5;
 
         const SIGN_DEFINITIONS = [
-    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
-    "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
-    "almohada", "azotea", "azúcarera", "baño", "barrer", "batidora", "bote", "buzón",
-    "cacerola", "cajón", "cama", "candelero", "casa", "cazuela", "cepillo de dientes",
-    "cepillo de pelo", "champú", "charola", "chupón", "cobertor",
-    "antropología", "bandera", "calificación", "campana", "certificado", "compás",
-    "computación", "cuaderno", "dibujo", "diccionario", "escala", "escuadra", "escuela",
-    "estudiante", "goma", "lápiz", "lección", "mapa", "microscopio", "papel",
-    "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",
-    "septiembre", "octubre", "noviembre", "diciembre",
-    "naranja", "rojo", "verde", "rosa", "blanco", "negro", "café",
-    "primavera", "verano", "otoño", "invierno",
-    "lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo",
-    "vaca", "lobo", "jirafa", "tiburón", "perro", "gato", "puerco", "rinoceronte",
-    "serpiente", "tigre",
-    "Grosería (Tonto)", "Grosería (Wey)", "Grosería (Idiota)", "Grosería (Puto)",
-    "Grosería (Mierda)", "Grosería (Zorra)", "Grosería (Pendejo)", "Grosería (Verga)"
-    
-];
-
-
+            // Abecedario
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+            // Casa
+            'almohada', 'azotea', 'azúcarera', 'baño', 'barrer', 'batidora', 'bote', 'buzón',
+            'cacerola', 'cajón', 'cama', 'candelero', 'casa', 'cazuela', 'cepillo de dientes',
+            'cepillo de pelo', 'champú', 'charola', 'chupón', 'cobertor', 'coladera', 'colcha',
+            'colador', 'comal', 'comedor', 'cómoda', 'condominio', 'copa', 'corredor', 'corriente',
+            'cortina', 'cuarto', 'cuchara', 'cuchillo', 'departamento', 'destapador',
+            // Escuela
+            'antropología', 'bandera', 'calificación', 'campana', 'certificado', 'compás',
+            'computación', 'cuaderno', 'dibujo', 'diccionario', 'escala', 'escuadra', 'escuela',
+            'estudiante', 'goma', 'lápiz', 'lección', 'mapa', 'microscopio', 'papel', 'párrafo',
+            'perspectiva', 'pizarrón', 'pluma', 'politécnico', 'premio', 'preparatoria', 'primaria',
+            'prueba', 'química', 'sacapuntas', 'secundaria', 'tecnológico',
+            // Meses
+            'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto',
+            'septiembre', 'octubre', 'noviembre', 'diciembre',
+            // Colores
+            'naranja', 'rojo', 'verde', 'rosa', 'blanco', 'negro', 'café',
+            // Estaciones
+            'primavera', 'verano', 'otoño', 'invierno',
+            // Días de la semana
+            'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo',
+            // Animales
+            'vaca', 'lobo', 'jirafa', 'tiburón', 'perro', 'gato', 'puerco', 'rinoceronte',
+            'serpiente', 'tigre', 'toro', 'libélula', 'lagarto', 'gorila', 'foca',
+            // Groserías
+            'Grosería (Tonto)', 'Grosería (Güey)', 'Grosería (Idiota)', 'Grosería (Puto)',
+            'Grosería (Mierda)', 'Grosería (Zorra)', 'Grosería (Pendejo)', 'Grosería (Verga)',
+            // Saludos y otras palabras
+            'saludo_hola', 'saludo_adios', 'saludo_como_estas', 'saludo_comparte', 'saludo_ayuda'
+        ];
 
         function normalizeLandmarks(landmarks) {
-    if (!landmarks || landmarks.length !== 21) {
-        console.log('[DEBUG] Invalid landmarks array length:', landmarks ? landmarks.length : 'null');
-        return Array(21).fill({ x: 0, y: 0, z: 0 });
-    }
-    return landmarks.map(lm => ({
-        x: lm.x * 2 - 1,
-        y: lm.y * 2 - 1,
-        z: lm.z * 2 - 1
-    }));
-}
-
-
-
-
-
+            if (!landmarks || landmarks.length !== 21) {
+                console.log('[DEBUG] Invalid landmarks array length:', landmarks ? landmarks.length : 'null');
+                return Array(21).fill({ x: 0, y: 0, z: 0 });
+            }
+            return landmarks.map(lm => ({
+                x: lm.x * 2 - 1,
+                y: lm.y * 2 - 1,
+                z: lm.z * 2 - 1
+            }));
+        }
 
         function smoothLandmarks(landmarks) {
             if (smoothedLandmarks.length === 0) {
                 smoothedLandmarks = landmarks.map(lm => ({ x: lm.x, y: lm.y, z: lm.z }));
                 return landmarks;
             }
-            const SMOOTHER_FACTOR = 0.4;
+            const SMOOTHER_FACTOR = 0.3;
             const smooth = landmarks.map((lm, i) => {
                 const prev = smoothedLandmarks[i] || { x: lm.x, y: lm.y, z: lm.z };
                 return {
@@ -391,89 +346,264 @@
             );
         }
 
-        function estaDedoDoblado(tip, mcp, umbral = 0.04) {
+        function estaDedoDoblado(tip, mcp, umbral = 0.05) {
             return distanciaEuclidiana(tip, mcp) < umbral;
         }
 
-        function estaDedoExtendido(tip, mcp, umbral = 0.08) {
+        function estaDedoExtendido(tip, mcp, umbral = 0.07) {
             return distanciaEuclidiana(tip, mcp) > umbral;
         }
 
+        function detectLSMSign(landmarks) {
+            if (!landmarks || landmarks.length !== 21) return null;
 
+            const normalized = normalizeLandmarks(landmarks);
+            const smoothed = smoothLandmarks(normalized);
 
+            // Landmark indices for fingers
+            const THUMB_TIP = 4, THUMB_MCP = 2;
+            const INDEX_TIP = 8, INDEX_MCP = 5;
+            const MIDDLE_TIP = 12, MIDDLE_MCP = 9;
+            const RING_TIP = 16, RING_MCP = 13;
+            const PINKY_TIP = 20, PINKY_MCP = 17;
+            const WRIST = 0;
 
+            // Letter A: Fist with thumb on side
+            const isThumbAsideA = smoothed[THUMB_TIP].x > smoothed[INDEX_MCP].x + 0.03;
+            const isIndexFoldedA = estaDedoDoblado(smoothed[INDEX_TIP], smoothed[INDEX_MCP], 0.06);
+            const isMiddleFoldedA = estaDedoDoblado(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP], 0.06);
+            const isRingFoldedA = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP], 0.06);
+            const isPinkyFoldedA = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP], 0.06);
+            if (isThumbAsideA && isIndexFoldedA && isMiddleFoldedA && isRingFoldedA && isPinkyFoldedA) {
+                return 'A';
+            }
 
-       function startCamera() {
-    if (cameraInstance) {
-        console.log('[DEBUG] Camera already running');
-        return;
-    }
+            // Letter B: All fingers extended, thumb folded across palm
+            const isThumbFoldedB = distanciaEuclidiana(smoothed[THUMB_TIP], smoothed[PINKY_MCP]) < 0.12;
+            const isIndexExtendedB = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP], 0.06);
+            const isMiddleExtendedB = estaDedoExtendido(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP], 0.06);
+            const isRingExtendedB = estaDedoExtendido(smoothed[RING_TIP], smoothed[RING_MCP], 0.06);
+            const isPinkyExtendedB = estaDedoExtendido(smoothed[PINKY_TIP], smoothed[PINKY_MCP], 0.06);
+            if (isThumbFoldedB && isIndexExtendedB && isMiddleExtendedB && isRingExtendedB && isPinkyExtendedB) {
+                return 'B';
+            }
 
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const status = document.getElementById('status');
-    const gesture = document.getElementById('gesture');
-    const errorMessage = document.getElementById('errorMessage');
-    const debugMessage = document.getElementById('debugMessage');
-    const videoContainer = document.getElementById('videoContainer');
+            // Letter C: Fingers curved, thumb and fingers forming a C shape
+            const thumbIndexDistC = distanciaEuclidiana(smoothed[THUMB_TIP], smoothed[INDEX_TIP]);
+            const isCFingerShape = thumbIndexDistC > 0.08 && thumbIndexDistC < 0.22;
+            const isMiddleCurvedC = distanciaEuclidiana(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]) > 0.04 && distanciaEuclidiana(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]) < 0.12;
+            if (isCFingerShape && isMiddleCurvedC) {
+                return 'C';
+            }
 
-    if (!video || !canvas || !status || !gesture || !errorMessage || !debugMessage || !videoContainer) {
-        console.error('[ERROR] Missing DOM elements for camera');
-        errorMessage.textContent = 'Error: Elementos de la interfaz no encontrados.';
-        errorMessage.classList.remove('hidden');
-        return;
-    }
+            // Letter D: Index extended, others folded, thumb touches middle
+            const isIndexExtendedD = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP], 0.06);
+            const isMiddleFoldedD = estaDedoDoblado(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP], 0.06);
+            const isRingFoldedD = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP], 0.06);
+            const isPinkyFoldedD = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP], 0.06);
+            const isThumbTouchingMiddleD = distanciaEuclidiana(smoothed[THUMB_TIP], smoothed[MIDDLE_MCP]) < 0.08;
+            if (isIndexExtendedD && isMiddleFoldedD && isRingFoldedD && isPinkyFoldedD && isThumbTouchingMiddleD) {
+                return 'D';
+            }
 
-    currentVideo = video;
-    const canvasCtx = canvas.getContext('2d');
+            // Letter F: Index and thumb form a circle, others extended
+            const isThumbIndexCircleF = distanciaEuclidiana(smoothed[THUMB_TIP], smoothed[INDEX_TIP]) < 0.08;
+            const isMiddleExtendedF = estaDedoExtendido(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP], 0.06);
+            const isRingExtendedF = estaDedoExtendido(smoothed[RING_TIP], smoothed[RING_MCP], 0.06);
+            const isPinkyExtendedF = estaDedoExtendido(smoothed[PINKY_TIP], smoothed[PINKY_MCP], 0.06);
+            if (isThumbIndexCircleF && isMiddleExtendedF && isRingExtendedF && isPinkyExtendedF) {
+                return 'F';
+            }
 
-    handsInstance = new Hands({
-        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1646424915/${file}`
-    });
+            // Letter G: Index and thumb extended, others folded
+            const isIndexExtendedG = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP], 0.06);
+            const isThumbExtendedG = estaDedoExtendido(smoothed[THUMB_TIP], smoothed[THUMB_MCP], 0.06);
+            const isMiddleFoldedG = estaDedoDoblado(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP], 0.06);
+            const isRingFoldedG = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP], 0.06);
+            const isPinkyFoldedG = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP], 0.06);
+            if (isIndexExtendedG && isThumbExtendedG && isMiddleFoldedG && isRingFoldedG && isPinkyFoldedG) {
+                return 'G';
+            }
 
-    handsInstance.setOptions({
-        maxNumHands: 2,
-        modelComplexity: 1,
-        minDetectionConfidence: 0.7,
-        minTrackingConfidence: 0.7
-    });
+            // Letter H: Index and middle extended, others folded
+            const isIndexExtendedH = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP], 0.06);
+            const isMiddleExtendedH = estaDedoExtendido(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP], 0.06);
+            const isRingFoldedH = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP], 0.06);
+            const isPinkyFoldedH = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP], 0.06);
+            const isThumbAsideH = smoothed[THUMB_TIP].x > smoothed[MIDDLE_MCP].x + 0.03;
+            if (isIndexExtendedH && isMiddleExtendedH && isRingFoldedH && isPinkyFoldedH && isThumbAsideH) {
+                return 'H';
+            }
 
-    let model, webcam, maxPredictions, lastPredictionTime = 0;
-    const PREDICTION_INTERVAL = 1000; // 1 fps
-    const URL = "/my_model/"; // Ajusta la ruta si es necesario
+            // Hola: Open hand near face, palm facing inward
+            const isHandOpenHola = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP], 0.06) &&
+                                   estaDedoExtendido(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP], 0.06) &&
+                                   estaDedoExtendido(smoothed[RING_TIP], smoothed[RING_MCP], 0.06) &&
+                                   estaDedoExtendido(smoothed[PINKY_TIP], smoothed[PINKY_MCP], 0.06);
+            const isPalmInwardHola = smoothed[THUMB_TIP].x < smoothed[PINKY_TIP].x; // Palm faces user
+            const isNearFaceHola = smoothed[WRIST].y < -0.2; // Hand high in frame (near face)
+            if (isHandOpenHola && isPalmInwardHola && isNearFaceHola) {
+                return 'saludo_hola';
+            }
 
-    async function init() {
-        const modelURL = URL + "model.json";
-        const metadataURL = URL + "metadata.json";
-        model = await tmImage.load(modelURL, metadataURL);
-        maxPredictions = model.getTotalClasses();
-        console.log('[DEBUG] Model loaded with', maxPredictions, 'classes');
+            // Adiós: Open hand, palm outward, fingers extended
+            const isHandOpenAdios = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP], 0.06) &&
+                                    estaDedoExtendido(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP], 0.06) &&
+                                    estaDedoExtendido(smoothed[RING_TIP], smoothed[RING_MCP], 0.06) &&
+                                    estaDedoExtendido(smoothed[PINKY_TIP], smoothed[PINKY_MCP], 0.06);
+            const isPalmOutwardAdios = smoothed[THUMB_TIP].x > smoothed[PINKY_TIP].x; // Palm faces away
+            if (isHandOpenAdios && isPalmOutwardAdios) {
+                return 'saludo_adios';
+            }
 
-        webcam = new tmImage.Webcam(224, 224, true);
-        await webcam.setup();
-        await webcam.play();
-        await webcam.update(); // Asegura el primer frame
-    }
+            // Cómo estás: Hand in C shape near chin
+            const thumbIndexDistComoEstas = distanciaEuclidiana(smoothed[THUMB_TIP], smoothed[INDEX_TIP]);
+            const isCFingerShapeComoEstas = thumbIndexDistC > 0.08 && thumbIndexDistC < 0.22;
+            const isMiddleCurvedComoEstas = distanciaEuclidiana(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]) > 0.04 && distanciaEuclidiana(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP]) < 0.12;
+            const isNearChinComoEstas = smoothed[WRIST].y < -0.2 && smoothed[WRIST].y > -0.4; // Near chin level
+            if (isCFingerShapeComoEstas && isMiddleCurvedComoEstas && isNearChinComoEstas) {
+                return 'saludo_como_estas';
+            }
 
-    async function predict() {
-        const currentTime = performance.now();
-        if (currentTime - lastPredictionTime < PREDICTION_INTERVAL) {
-            return;
+            // Comparte: V shape (index and middle extended), palm down
+            const isIndexExtendedComparte = estaDedoExtendido(smoothed[INDEX_TIP], smoothed[INDEX_MCP], 0.06);
+            const isMiddleExtendedComparte = estaDedoExtendido(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP], 0.06);
+            const isRingFoldedComparte = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP], 0.06);
+            const isPinkyFoldedComparte = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP], 0.06);
+            const isPalmDownComparte = smoothed[INDEX_TIP].z > smoothed[WRIST].z; // Palm faces down
+            if (isIndexExtendedComparte && isMiddleExtendedComparte && isRingFoldedComparte && isPinkyFoldedComparte && isPalmDownComparte) {
+                return 'saludo_comparte';
+            }
+
+            // Ayuda: A shape, palm up, near chest
+            const isThumbAsideAyuda = smoothed[THUMB_TIP].x > smoothed[INDEX_MCP].x + 0.03;
+            const isIndexFoldedAyuda = estaDedoDoblado(smoothed[INDEX_TIP], smoothed[INDEX_MCP], 0.06);
+            const isMiddleFoldedAyuda = estaDedoDoblado(smoothed[MIDDLE_TIP], smoothed[MIDDLE_MCP], 0.06);
+            const isRingFoldedAyuda = estaDedoDoblado(smoothed[RING_TIP], smoothed[RING_MCP], 0.06);
+            const isPinkyFoldedAyuda = estaDedoDoblado(smoothed[PINKY_TIP], smoothed[PINKY_MCP], 0.06);
+            const isPalmUpAyuda = smoothed[INDEX_TIP].z < smoothed[WRIST].z; // Palm faces up
+            const isNearChestAyuda = smoothed[WRIST].y > -0.1 && smoothed[WRIST].y < 0.1; // Chest level
+            if (isThumbAsideAyuda && isIndexFoldedAyuda && isMiddleFoldedAyuda && isRingFoldedAyuda && isPinkyFoldedAyuda && isPalmUpAyuda && isNearChestAyuda) {
+                return 'saludo_ayuda';
+            }
+
+            return null;
         }
 
-        await webcam.update(); // Actualiza el frame
-        const prediction = await model.predict(webcam.canvas);
-        for (let i = 0; i < maxPredictions; i++) {
-            const classPrediction = prediction[i];
-            const predictedSign = SIGN_DEFINITIONS[i] || `Desconocida (índice ${i})`;
-            console.log(`[DEBUG] Class ${i}: ${predictedSign}, Probability: ${classPrediction.probability.toFixed(2)}`);
+        function startCamera() {
+            if (cameraInstance) {
+                console.log('[DEBUG] Camera already running');
+                return;
+            }
 
-            if (classPrediction.probability > 0.2) { // Umbral reducido a 0.2
-                if (predictedSign !== lastDetectedSign) {
-                    console.log(`[DEBUG] Sign detected: ${predictedSign} (confidence: ${classPrediction.probability.toFixed(2)})`);
-                    gesture.textContent = `Seña detectada: ${predictedSign}`;
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const status = document.getElementById('status');
+            const gesture = document.getElementById('gesture');
+            const errorMessage = document.getElementById('errorMessage');
+            const debugMessage = document.getElementById('debugMessage');
+            const videoContainer = document.getElementById('videoContainer');
+
+            if (!video || !canvas || !status || !gesture || !errorMessage || !debugMessage || !videoContainer) {
+                console.error('[ERROR] Missing DOM elements for camera');
+                errorMessage.textContent = 'Error: Elementos de la interfaz no encontrados.';
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+
+            currentVideo = video;
+            const canvasCtx = canvas.getContext('2d');
+
+            handsInstance = new Hands({
+                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1646424915/${file}`
+            });
+
+            handsInstance.setOptions({
+                maxNumHands: 2,
+                modelComplexity: 0,
+                minDetectionConfidence: 0.6,
+                minTrackingConfidence: 0.6
+            });
+
+            handsInstance.onResults(async (results) => {
+                const currentTime = performance.now();
+                if (currentTime - lastFrameTime < FRAME_INTERVAL) {
+                    return;
+                }
+                lastFrameTime = currentTime;
+
+                canvasCtx.save();
+                canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+                canvasCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                let detectedSign = null;
+                let debugInfo = [];
+
+                try {
+                    if (results.multiHandLandmarks && results.multiHandedness) {
+                        videoContainer.classList.add('hands-detected');
+                        status.textContent = 'Manos detectadas';
+                        status.classList.remove('blink');
+
+                        for (let i = 0; i < results.multiHandLandmarks.length; i++) {
+                            const landmarks = results.multiHandLandmarks[i];
+                            const handedness = results.multiHandedness[i];
+                            drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, { color: '#34d399', lineWidth: 5 });
+                            drawLandmarks(canvasCtx, landmarks, { color: '#a855f7', lineWidth: 2 });
+
+                            let sign = detectLSMSign(landmarks);
+                            // Map prefixed signs to user-friendly names
+                            if (sign && sign.startsWith('saludo_')) {
+                                sign = sign.replace('saludo_', '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                            }
+                            if (sign && !INAPPROPRIATE_SIGNS.includes(sign)) {
+                                detectionHistory.push(sign);
+                                if (detectionHistory.length > DETECTION_HISTORY_SIZE) {
+                                    detectionHistory.shift();
+                                }
+                                const mostCommonSign = detectionHistory
+                                    .sort((a, b) =>
+                                        detectionHistory.filter(v => v === a).length -
+                                        detectionHistory.filter(v => v === b).length
+                                    )
+                                    .pop();
+                                if (detectionHistory.filter(v => v === mostCommonSign).length >= DETECTION_HISTORY_SIZE * 0.6) {
+                                    detectedSign = mostCommonSign;
+                                }
+                                debugInfo.push(`Mano ${i + 1} (${handedness.label}): ${sign}`);
+                            } else {
+                                detectionHistory.push(null);
+                                if (detectionHistory.length > DETECTION_HISTORY_SIZE) {
+                                    detectionHistory.shift();
+                                }
+                                debugInfo.push(`Mano ${i + 1} (${handedness.label}): No detectada`);
+                            }
+                        }
+                    } else {
+                        videoContainer.classList.remove('hands-detected');
+                        status.textContent = 'No se detectan manos';
+                        status.classList.add('blink');
+                        detectionHistory.push(null);
+                        if (detectionHistory.length > DETECTION_HISTORY_SIZE) {
+                            detectionHistory.shift();
+                        }
+                        debugInfo.push('No se detectaron manos');
+                    }
+                } catch (generalError) {
+                    console.error('[ERROR] Error general en onResults:', generalError);
+                    errorMessage.textContent = 'Error al procesar el frame';
+                    errorMessage.classList.remove('hidden');
+                }
+
+                canvasCtx.restore();
+
+                if (detectedSign && detectedSign !== lastDetectedSign && sePuedeDetectar) {
+                    gesture.textContent = `Seña detectada: ${detectedSign}`;
+                    debugMessage.textContent = debugInfo.join('\n');
+                    debugMessage.classList.remove('hidden');
+
                     if (selectedVoice && 'speechSynthesis' in window) {
-                        const utterance = new SpeechSynthesisUtterance(predictedSign);
+                        const utterance = new SpeechSynthesisUtterance(detectedSign);
                         utterance.voice = selectedVoice;
                         utterance.lang = selectedVoice ? selectedVoice.lang : 'es-MX';
                         utterance.volume = 1;
@@ -482,116 +612,82 @@
                         speechSynthesis.cancel();
                         speechSynthesis.speak(utterance);
                     }
-                    lastDetectedSign = predictedSign;
+                    lastDetectedSign = detectedSign;
+                    ultimaSeña = detectedSign;
+                    sePuedeDetectar = false;
+                    setTimeout(() => {
+                        sePuedeDetectar = true;
+                    }, 800);
+                } else if (!detectedSign) {
+                    gesture.textContent = 'Seña detectada: Ninguna';
+                    lastDetectedSign = null;
+                    debugMessage.textContent = debugInfo.join('\n');
+                    debugMessage.classList.remove('hidden');
                 }
-                lastPredictionTime = currentTime;
-                return;
-            }
-        }
-        if (lastDetectedSign) {
-            gesture.textContent = 'Seña detectada: Ninguna';
-            lastDetectedSign = null;
-        }
-    }
 
-    handsInstance.onResults(async (results) => {
-        const currentTime = performance.now();
-        if (currentTime - lastFrameTime < FRAME_INTERVAL) {
-            return;
-        }
-        lastFrameTime = currentTime;
-
-        const canvasCtx = canvas.getContext('2d');
-        canvasCtx.save();
-        canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-        canvasCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        let debugInfo = [];
-
-        try {
-            if (results.multiHandLandmarks && results.multiHandedness) {
-                videoContainer.classList.add('hands-detected');
-                status.textContent = 'Manos detectadas';
-                status.classList.remove('blink');
-
-                for (let i = 0; i < results.multiHandLandmarks.length; i++) {
-                    const landmarks = results.multiHandLandmarks[i];
-                    const handedness = results.multiHandedness[i];
-                    drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, { color: '#34d399', lineWidth: 5 });
-                    drawLandmarks(canvasCtx, landmarks, { color: '#a855f7', lineWidth: 2 });
-
-                    if (!model) await init();
-                    await predict();
-                    const predictedSign = gesture.textContent.replace('Seña detectada: ', '');
-                    if (predictedSign !== 'Ninguna') {
-                        debugInfo.push(`Mano ${i + 1} (${handedness.label}): ${predictedSign}`);
-                    } else {
-                        debugInfo.push(`Mano ${i + 1} (${handedness.label}): No detectada`);
-                    }
-                }
-            } else {
-                videoContainer.classList.remove('hands-detected');
-                status.textContent = 'No se detectan manos';
-                status.classList.add('blink');
-                debugInfo.push('No se detectaron manos');
-            }
-        } catch (generalError) {
-            console.error('[ERROR] Error general en onResults:', generalError);
-        }
-
-        canvasCtx.restore();
-
-        if (debugInfo.length > 0) {
-            debugMessage.textContent = debugInfo.join('\n');
-            debugMessage.classList.remove('hidden');
-        } else {
-            debugMessage.classList.add('hidden');
-        }
-
-        console.log('[DEBUG] Frame processed:\n' + debugInfo.join('\n'));
-    });
-
-    navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user', width: 640, height: 480 }
-    }).then(stream => {
-        video.srcObject = stream;
-        video.play().catch(err => {
-            console.error('[ERROR] Failed to play video:', err);
-            errorMessage.textContent = 'Error al reproducir el video. Verifica los permisos de la cámara.';
-            errorMessage.classList.remove('hidden');
-            status.textContent = 'Error en la cámara';
-            status.classList.add('blink');
-        });
-
-        video.onloadedmetadata = () => {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            cameraInstance = new Camera(video, {
-                onFrame: async () => {
-                    await handsInstance.send({ image: video });
-                },
-                width: video.videoWidth,
-                height: video.videoHeight
+                console.log('[DEBUG] Frame processed:\n' + debugInfo.join('\n'));
             });
-            cameraInstance.start();
-            status.textContent = 'Cámara iniciada';
-            console.log('[DEBUG] Camera started with resolution ' + video.videoWidth + 'x' + video.videoHeight);
-        };
-    }).catch(err => {
-        console.error('[ERROR] Camera access denied:', err);
-        errorMessage.textContent = 'No se pudo acceder a la cámara. Por favor, permite el acceso.';
-        errorMessage.classList.remove('hidden');
-        status.textContent = 'Error: Cámara no disponible';
-        status.classList.add('blink');
-    });
-}
 
+            navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'user', width: 640, height: 480 }
+            }).then(stream => {
+                video.srcObject = stream;
+                video.play().catch(err => {
+                    console.error('[ERROR] Failed to play video:', err);
+                    errorMessage.textContent = 'Error al reproducir el video. Verifica los permisos de la cámara.';
+                    errorMessage.classList.remove('hidden');
+                    status.textContent = 'Error en la cámara';
+                    status.classList.add('blink');
+                });
 
+                video.onloadedmetadata = () => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    cameraInstance = new Camera(video, {
+                        onFrame: async () => {
+                            await handsInstance.send({ image: video });
+                        },
+                        width: video.videoWidth,
+                        height: video.videoHeight
+                    });
+                    cameraInstance.start();
+                    status.textContent = 'Cámara iniciada';
+                    console.log('[DEBUG] Camera started with resolution ' + video.videoWidth + 'x' + video.videoHeight);
+                };
+            }).catch(err => {
+                console.error('[ERROR] Camera access denied:', err);
+                errorMessage.textContent = 'No se pudo acceder a la cámara. Por favor, permite el acceso.';
+                errorMessage.classList.remove('hidden');
+                status.textContent = 'Error: Cámara no disponible';
+                status.classList.add('blink');
+            });
+        }
 
-
-
-
-
+        function stopCamera() {
+            if (cameraInstance) {
+                cameraInstance.stop();
+                cameraInstance = null;
+                console.log('[DEBUG] Camera stopped');
+            }
+            if (currentVideo && currentVideo.srcObject) {
+                const stream = currentVideo.srcObject;
+                const tracks = stream.getTracks();
+                tracks.forEach(track => track.stop());
+                currentVideo.srcObject = null;
+                console.log('[DEBUG] Video stream stopped');
+            }
+            if (handsInstance) {
+                handsInstance.close();
+                handsInstance = null;
+                console.log('[DEBUG] Hands instance closed');
+            }
+            landmarkHistory = [];
+            smoothedLandmarks = [];
+            detectionHistory = [];
+            lastDetectedSign = null;
+            sePuedeDetectar = true;
+            ultimaSeña = null;
+        }
 
         function clearScreen() {
             app.innerHTML = '';
@@ -771,7 +867,10 @@
             const contentContainer = document.getElementById('contentContainer');
             contentContainer.innerHTML = `<div class="debug-text">Cargando categorías de ${type}...</div>`;
 
-            const subfolders = ['abecedario', 'animales', 'casa', 'colores', 'comida', 'cuerpo', 'diasdesemana', 'escuela', 'estaciones', 'meses', 'tiempo', 'saludos'];
+            const subfolders = [
+                'abecedario', 'animales', 'casa', 'colores', 'comida', 'cuerpo', 'diasdesemana',
+                'escuela', 'estaciones', 'meses', 'tiempo', 'saludos', 'groserias'
+            ];
             contentContainer.innerHTML = `
                 <h3 class="text-2xl font-semibold mb-4">Categorías de ${type.charAt(0).toUpperCase() + type.slice(1)}</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -794,42 +893,40 @@
             console.log('[DEBUG] Categories loaded: ' + type);
         }
 
-        
+        function showVideos(folder) {
+            const contentContainer = document.getElementById('contentContainer');
+            const videoFiles = [
+                { name: 'Video 1', path: `/LENGUAJE-DE-SENAS/assets/videos/${folder}/Video1.mp4` },
+                { name: 'Video 2', path: `/LENGUAJE-DE-SENAS/${folder}/${folder}/videos/Video2.mp4` },
+                { name: 'Video 3', path: `/Videos/${folder}/Video3.mp4` },
+                { name: 'Videos 4', path: '/LENGUAJE-DE-SENAS/**/${folder}/Video4.mp4' }
+            ];
 
-function showVideos(folder) {
-    const contentContainer = document.getElementById('contentContainer');
-    const videoFiles = [
-        { name: 'Video 1', path: `/LENGUAJE-DE-SENAS/assets/videos/Video1.mp4` },
-        { name: 'Video 2', path: `/LENGUAJE-DE-SENAS/assets/videos/Video2.mp4` },
-        { name: 'Video 3', path: `/LENGUAJE-DE-SENAS/assets/videos/Video3.mp4` },
-        { name: 'Video 4', path: `/LENGUAJE-DE-SENAS/assets/videos/Video4.mp4` }
-    ];
-
-    contentContainer.innerHTML = `
-        <h3 class="text-2xl font-semibold mb-4">${folder.charAt(0).toUpperCase() + folder.slice(1)}</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            ${videoFiles.map(video => `
-                <div class="card p-4 text-center">
-                    <video controls preload="metadata" class="w-full max-w-md rounded-lg">
-                        <source src="${video.path}" type="video/mp4">
-                        Tu navegador no soporta el elemento de video.
-                    </video>
-                    <p class="mt-2">Vídeo: ${video.name} - ${folder}</p>
+            contentContainer.innerHTML = `
+                <h3 class="text-2xl font-semibold mb-4">${folder.charAt(0).toUpperCase() + folder.slice(1)}</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${videoFiles.map(video => `
+                        <div class="card p-4 text-center">
+                            <video controls preload="metadata" class="w-full max-w-md rounded-lg">
+                                <source src="${video.path}" type="video/mp4">
+                                Tu navegador no soporta el elemento de video.
+                            </video>
+                            <p class="mt-2">Vídeo: ${video.name} - ${folder}</p>
+                        </div>
+                    `).join('')}
                 </div>
-            `).join('')}
-        </div>
-    `;
+            `;
 
-    contentContainer.querySelectorAll('video').forEach(video => {
-        video.onloadeddata = () => console.log('[DEBUG] Video loaded: ' + video.querySelector('source').src);
-        video.onerror = () => {
-            console.error('[ERROR] Video failed to load: ' + video.querySelector('source').src);
-            video.parentElement.innerHTML += '<div class="error-message">No se pudo cargar el video.</div>';
-        };
-    });
+            contentContainer.querySelectorAll('video').forEach(video => {
+                video.onloadeddata = () => console.log('[DEBUG] Video loaded: ' + video.querySelector('source').src);
+                video.onerror = () => {
+                    console.error('[ERROR] Video failed to load: ' + video.querySelector('source').src);
+                    video.parentElement.innerHTML += '<div class="error-message">No se pudo cargar el video.</div>';
+                };
+            });
 
-    console.log('[DEBUG] Videos loaded for: ' + folder);
-}
+            console.log('[DEBUG] Videos loaded for: ' + folder);
+        }
 
         function showImages(folder) {
             const contentContainer = document.getElementById('contentContainer');
@@ -867,205 +964,194 @@ function showVideos(folder) {
             const basePath = `assets/img/${folder}/`;
             const images = {
                 abecedario: [
-                    { name: 'letra_A.jpg', path: `${basePath}letra_A.jpg` },
-                    { name: 'letra_B.jpg', path: `${basePath}letra_B.jpg` },
-                    { name: 'letra_C.jpg', path: `${basePath}letra_C.jpg` },
-                    { name: 'letra_D.jpg', path: `${basePath}letra_D.jpg` },
-                    { name: 'letra_E.jpg', path: `${basePath}letra_E.jpg` },
-                    { name: 'letra_F.jpg', path: `${basePath}letra_F.jpg` },
-                    { name: 'letra_G.jpg', path: `${basePath}letra_G.jpg` },
-                    { name: 'letra_H.jpg', path: `${basePath}letra_H.jpg` },
-                    { name: 'letra_I.jpg', path: `${basePath}letra_I.jpg` },
-                    { name: 'letra_J.jpg', path: `${basePath}letra_J.jpg` },
-                    { name: 'letra_K.jpg', path: `${basePath}letra_K.jpg` },
-                    { name: 'letra_L.jpg', path: `${basePath}letra_L.jpg` },
-                    { name: 'letra_M.jpg', path: `${basePath}letra_M.jpg` },
-                    { name: 'letra_N.jpg', path: `${basePath}letra_N.jpg` },
-                    { name: 'letra_O.jpg', path: `${basePath}letra_O.jpg` },
-                    { name: 'letra_P.jpg', path: `${basePath}letra_P.jpg` },
-                    { name: 'letra_Q.jpg', path: `${basePath}letra_Q.jpg` },
-                    { name: 'letra_R.jpg', path: `${basePath}letra_R.jpg` },
-                    { name: 'letra_S.jpg', path: `${basePath}letra_S.jpg` },
-                    { name: 'letra_T.jpg', path: `${basePath}letra_T.jpg` },
-                    { name: 'letra_U.jpg', path: `${basePath}letra_U.jpg` },
-                    { name: 'letra_V.jpg', path: `${basePath}letra_V.jpg` },
-                    { name: 'letra_W.jpg', path: `${basePath}letra_W.jpg` },
-                    { name: 'letra_X.jpg', path: `${basePath}letra_X.jpg` },
-                    { name: 'letra_Y.jpg', path: `${basePath}letra_Y.jpg` },
-                    { name: 'letra_Z.jpg', path: `${basePath}letra_Z.jpg` }
+                    { name: 'Letra A', path: `${basePath}letra_A.jpg` },
+                    { name: 'Letra B', path: `${basePath}letra_B.jpg` },
+                    { name: 'Letra C', path: `${basePath}letra_C.jpg` },
+                    { name: 'Letra D', path: `${basePath}letra_D.jpg` },
+                    { name: 'Letra E', path: `${basePath}letra_E.jpg` },
+                    { name: 'Letra F', path: `${basePath}letra_F.jpg` },
+                    { name: 'Letra G', path: `${basePath}letra_G.jpg` },
+                    { name: 'Letra H', path: `${basePath}letra_H.jpg` },
+                    { name: 'Letra I', path: `${basePath}letra_I.jpg` },
+                    { name: 'Letra J', path: `${basePath}letra_J.jpg` },
+                    { name: 'Letra K', path: `${basePath}letra_K.jpg` },
+                    { name: 'Letra L', path: `${basePath}letra_L.jpg` },
+                    { name: 'Letra M', path: `${basePath}letra_M.jpg` },
+                    { name: 'Letra N', path: `${basePath}letra_N.jpg` },
+                    { name: 'Letra O', path: `${basePath}letra_O.jpg` },
+                    { name: 'Letra P', path: `${basePath}letra_P.jpg` },
+                    { name: 'Letra Q', path: `${basePath}letra_Q.jpg` },
+                    { name: 'Letra R', path: `${basePath}letra_R.jpg` },
+                    { name: 'Letra S', path: `${basePath}letra_S.jpg` },
+                    { name: 'Letra T', path: `${basePath}letra_T.jpg` },
+                    { name: 'Letra U', path: `${basePath}letra_U.jpg` },
+                    { name: 'Letra V', path: `${basePath}letra_V.jpg` },
+                    { name: 'Letra W', path: `${basePath}letra_W.jpg` },
+                    { name: 'Letra X', path: `${basePath}letra_X.jpg` },
+                    { name: 'Letra Y', path: `${basePath}letra_Y.jpg` },
+                    { name: 'Letra Z', path: `${basePath}letra_Z.jpg` }
                 ],
                 animales: [
-                    { name: 'imagen_panda.jpg', path: `${basePath}imagen_panda.jpg` },
-                    { name: 'imagen_perro.jpg', path: `${basePath}imagen_perro.jpg` },
-                    { name: 'imagen_puerco.jpg', path: `${basePath}imagen_puerco.jpg` },
-                    { name: 'imagen_rinoceronte.jpg', path: `${basePath}imagen_rinoceronte.jpg` },
-                    { name: 'imagen_serpiente.jpg', path: `${basePath}imagen_serpiente.jpg` },
-                    { name: 'imagen_tiburon.jpg', path: `${basePath}imagen_tiburon.jpg` },
-                    { name: 'imagen_tigre.jpg', path: `${basePath}imagen_tigre.jpg` },
-                    { name: 'imagen_toro.jpg', path: `${basePath}imagen_toro.jpg` },
-                    { name: 'imagen_vaca.jpg', path: `${basePath}imagen_vaca.jpg` }
+                    { name: 'Vaca', path: `${basePath}vaca.jpg` },
+                    { name: 'Lobo', path: `${basePath}lobo.jpg` },
+                    { name: 'Jirafa', path: `${basePath}jirafa.jpg` },
+                    { name: 'Tiburón', path: `${basePath}tiburon.jpg` },
+                    { name: 'Perro', path: `${basePath}perro.jpg` },
+                    { name: 'Gato', path: `${basePath}gato.jpg` },
+                    { name: 'Puerco', path: `${basePath}puerco.jpg` },
+                    { name: 'Rinoceronte', path: `${basePath}rinoceronte.jpg` },
+                    { name: 'Serpiente', path: `${basePath}serpiente.jpg` },
+                    { name: 'Tigre', path: `${basePath}tigre.jpg` },
+                    { name: 'Toro', path: `${basePath}toro.jpg` },
+                    { name: 'Libélula', path: `${basePath}libelula.jpg` },
+                    { name: 'Lagarto', path: `${basePath}lagarto.jpg` },
+                    { name: 'Gorila', path: `${basePath}gorila.jpg` },
+                    { name: 'Foca', path: `${basePath}foca.jpg` }
                 ],
                 casa: [
-                    { name: 'Captura de pantalla 2025-04-10 123015.png', path: `${basePath}Captura de pantalla 2025-04-10 123015.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123022.png', path: `${basePath}Captura de pantalla 2025-04-10 123022.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123028.png', path: `${basePath}Captura de pantalla 2025-04-10 123028.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123033.png', path: `${basePath}Captura de pantalla 2025-04-10 123033.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123039.png', path: `${basePath}Captura de pantalla 2025-04-10 123039.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123043.png', path: `${basePath}Captura de pantalla 2025-04-10 123043.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123047.png', path: `${basePath}Captura de pantalla 2025-04-10 123047.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123052.png', path: `${basePath}Captura de pantalla 2025-04-10 123052.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123100.png', path: `${basePath}Captura de pantalla 2025-04-10 123100.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123103.png', path: `${basePath}Captura de pantalla 2025-04-10 123103.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123112.png', path: `${basePath}Captura de pantalla 2025-04-10 123112.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123116.png', path: `${basePath}Captura de pantalla 2025-04-10 123116.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123120.png', path: `${basePath}Captura de pantalla 2025-04-10 123120.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123124.png', path: `${basePath}Captura de pantalla 2025-04-10 1230124.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123129.png', path: `${basePath}Captura de pantalla 2025-04-10 123129.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123132.png', path: `${basePath}Captura de pantalla 2025-04-10 123132.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123140.png', path: `${basePath}Captura de pantalla 2025-04-10 123140.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123145.png', path: `${basePath}Captura de pantalla 2025-04-10 123145.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123150.png', path: `${basePath}Captura de pantalla 2025-04-10 123150.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123155.png', path: `${basePath}Captura de pantalla 2025-04-10 123155.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123201.png', path: `${basePath}Captura de pantalla 2025-04-10 1230201.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123206.png', path: `${basePath}Captura de pantalla 2025-04-10 123206.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123213.png', path: `${basePath}Captura de pantalla 2025-04-10 123213.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123218.png', path: `${basePath}Captura de pantalla 2025-04-10 123218.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123223.png', path: `${basePath}Captura de pantalla 2025-04-10 123223.png` },
-                    { name: 'Captura de pantalla 2025-04-10 123229.png', path: `${basePath}Captura de pantalla 2025-04-10 123229.png` },
+                    { name: 'Almohada', path: `${basePath}almohada.jpg` },
+                    { name: 'Azotea', path: `${basePath}azotea.jpg` },
+                    { name: 'Azúcarera', path: `${basePath}azucarera.jpg` },
+                    { name: 'Baño', path: `${basePath}baño.jpg` },
+                    { name: 'Barrer', path: `${basePath}barrer.jpg` },
+                    { name: 'Batidora', path: `${basePath}batidora.jpg` },
+                    { name: 'Bote', path: `${basePath}bote.jpg` },
+                    { name: 'Buzón', path: `${basePath}buzon.jpg` },
+                    { name: 'Cacerola', path: `${basePath}cacerola.jpg` },
+                    { name: 'Cajón', path: `${basePath}cajon.jpg` },
+                    { name: 'Cama', path: `${basePath}cama.jpg` },
+                    { name: 'Candelero', path: `${basePath}candelero.jpg` },
+                    { name: 'Casa', path: `${basePath}casa.jpg` },
+                    { name: 'Cazuela', path: `${basePath}cazuela.jpg` },
+                    { name: 'Cepillo de dientes', path: `${basePath}cepillo_dientes.jpg` },
+                    { name: 'Cepillo de pelo', path: `${basePath}cepillo_pelo.jpg` },
+                    { name: 'Champú', path: `${basePath}champu.jpg` },
+                    { name: 'Charola', path: `${basePath}charola.jpg` },
+                    { name: 'Chupón', path: `${basePath}chupon.jpg` },
+                    { name: 'Cobertor', path: `${basePath}cobertor.jpg` },
+                    { name: 'Coladera', path: `${basePath}coladera.jpg` },
+                    { name: 'Colcha', path: `${basePath}colcha.jpg` },
+                    { name: 'Colador', path: `${basePath}colador.jpg` },
+                    { name: 'Comal', path: `${basePath}comal.jpg` },
+                    { name: 'Comedor', path: `${basePath}comedor.jpg` },
+                    { name: 'Cómoda', path: `${basePath}comoda.jpg` },
+                    { name: 'Condominio', path: `${basePath}condominio.jpg` },
+                    { name: 'Copa', path: `${basePath}copa.jpg` },
+                    { name: 'Corredor', path: `${basePath}corredor.jpg` },
+                    { name: 'Corriente', path: `${basePath}corriente.jpg` },
+                    { name: 'Cortina', path: `${basePath}cortina.jpg` },
+                    { name: 'Cuarto', path: `${basePath}cuarto.jpg` },
+                    { name: 'Cuchara', path: `${basePath}cuchara.jpg` },
+                    { name: 'Cuchillo', path: `${basePath}cuchillo.jpg` },
+                    { name: 'Departamento', path: `${basePath}departamento.jpg` },
+                    { name: 'Destapador', path: `${basePath}destapador.jpg` }
                 ],
                 colores: [
-                    { name: 'color_rojo.jpg', path: `${basePath}color_rojo.jpg` },
-                    { name: 'color_azul.jpg', path: `${basePath}color_azul.jpg` },
-                    { name: 'color_verde.jpg', path: `${basePath}color_verde.jpg` },
-                    { name: 'color_amarillo.jpg', path: `${basePath}color_amarillo.jpg` },
-                    { name: 'color_blanco.jpg', path: `${basePath}color_blanco.jpg` },
-                    { name: 'color_negro.jpg', path: `${basePath}color_negro.jpg` },
-                    { name: 'color_gris.jpg', path: `${basePath}color_gris.jpg` },
-                    { name: 'color_rosa.jpg', path: `${basePath}color_rosa.jpg` },
-                    { name: 'color_morado.jpg', path: `${basePath}color_morado.jpg` },
-                    { name: 'color_naranja.jpg', path: `${basePath}color_naranja.jpg` }
+                    { name: 'Naranja', path: `${basePath}naranja.jpg` },
+                    { name: 'Rojo', path: `${basePath}rojo.jpg` },
+                    { name: 'Verde', path: `${basePath}verde.jpg` },
+                    { name: 'Rosa', path: `${basePath}rosa.jpg` },
+                    { name: 'Blanco', path: `${basePath}blanco.jpg` },
+                    { name: 'Negro', path: `${basePath}negro.jpg` },
+                    { name: 'Café', path: `${basePath}cafe.jpg` }
                 ],
                 comida: [
-                    { name: 'Captura de pantalla 2025-04-10 103815.png', path: `${basePath}Captura de pantalla 2025-04-10 123815.png` },
-                    { name: 'Captura de pantalla 2025-04-10 103826.png', path: `${basePath}Captura de pantalla 2025-04-10 123826.png` },
-                    { name: 'Captura de pantalla 2025-04-10 103838.png', path: `${basePath}Captura de pantalla 2025-04-10 123838.png` },
-                    { name: 'Captura de pantalla 2025-04-10 103853.png', path: `${basePath}Captura de pantalla 2025-04-10 123853.png` },
-                    { name: 'Captura de pantalla 2025-04-10 103905.png', path: `${basePath}Captura de pantalla 2025-04-10 123905.png` },
-                    { name: 'Captura de pantalla 2025-04-10 103923.png', path: `${basePath}Captura de pantalla 2025-04-10 123923.png` },
-                    { name: 'Captura de pantalla 2025-04-10 103940.png', path: `${basePath}Captura de pantalla 2025-04-10 123940.png` },
-                    { name: 'Captura de pantalla 2025-04-10 103953.png', path: `${basePath}Captura de pantalla 2025-04-10 123953.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104007.png', path: `${basePath}Captura de pantalla 2025-04-10 124007.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104019.png', path: `${basePath}Captura de pantalla 2025-04-10 124019.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104029.png', path: `${basePath}Captura de pantalla 2025-04-10 124029.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104046.png', path: `${basePath}Captura de pantalla 2025-04-10 124046.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104057.png', path: `${basePath}Captura de pantalla 2025-04-10 124057.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104109.png', path: `${basePath}Captura de pantalla 2025-04-10 124109.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104120.png', path: `${basePath}Captura de pantalla 2025-04-10 124120.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104515.png', path: `${basePath}Captura de pantalla 2025-04-10 124515.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104528.png', path: `${basePath}Captura de pantalla 2025-04-10 124528.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104538.png', path: `${basePath}Captura de pantalla 2025-04-10 124538.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104553.png', path: `${basePath}Captura de pantalla 2025-04-10 124553.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104640.png', path: `${basePath}Captura de pantalla 2025-04-10 124640.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104651.png', path: `${basePath}Captura de pantalla 2025-04-10 124651.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104703.png', path: `${basePath}Captura de pantalla 2025-04-10 124703.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104714.png', path: `${basePath}Captura de pantalla 2025-04-10 124714.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104725.png', path: `${basePath}Captura de pantalla 2025-04-10 124725.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104737.png', path: `${basePath}Captura de pantalla 2025-04-10 124737.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104749.png', path: `${basePath}Captura de pantalla 2025-04-10 124749.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104800.png', path: `${basePath}Captura de pantalla 2025-04-10 124800.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104815.png', path: `${basePath}Captura de pantalla 2025-04-10 124815.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104829.png', path: `${basePath}Captura de pantalla 2025-04-10 124829.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104853.png', path: `${basePath}Captura de pantalla 2025-04-10 124853.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104918.png', path: `${basePath}Captura de pantalla 2025-04-10 124918.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104928.png', path: `${basePath}Captura de pantalla 2025-04-10 124928.png` },
-                    { name: 'Captura de pantalla 2025-04-10 104939.png', path: `${basePath}Captura de pantalla 2025-04-10 124939.png` },
-                    { name: 'Captura de pantalla 2025-04-10 105253.png', path: `${basePath}Captura de pantalla 2025-04-10 125253.png` },
-                    { name: 'Captura de pantalla 2025-04-10 110151.png', path: `${basePath}Captura de pantalla 2025-04-10 110151.png` },
-                    { name: 'Captura de pantalla 2025-04-10 110204.png', path: `${basePath}Captura de pantalla 2025-04-10 110204.png` },
-                    { name: 'Captura de pantalla 2025-04-10 110224.png', path: `${basePath}Captura de pantalla 2025-04-10 110224.png` },
-                    { name: 'Captura de pantalla 2025-04-10 110238.png', path: `${basePath}Captura de pantalla 2025-04-10 110238.png` },
-                    { name: 'Captura de pantalla 2025-04-10 110250.png', path: `${basePath}Captura de pantalla 2025-04-10 110250.png` },
+                    { name: 'Comida 1', path: `${basePath}comida_1.jpg` },
+                    { name: 'Comida 2', path: `${basePath}comida_2.jpg` },
                 ],
                 cuerpo: [
-                    { name: 'cuerpo_mano.jpg', path: `${basePath}cuerpo_mano.jpg` },
-                    { name: 'cuerpo_pie.jpg', path: `${basePath}cuerpo_pie.jpg` },
-                    { name: 'cuerpo_cabeza.jpg', path: `${basePath}cuerpo_cabeza.jpg` },
-                    { name: 'cuerpo_brazo.jpg', path: `${basePath}cuerpo_brazo.jpg` },
-                    { name: 'cuerpo_pierna.jpg', path: `${basePath}cuerpo_pierna.jpg` }
+                    { name: 'Mano', path: `${basePath}cuerpo_mano.jpg` },
+                    { name: 'Pie', path: `${basePath}cuerpo_pie.jpg` },
+                    { name: 'Cabeza', path: `${basePath}cuerpo_cabeza.jpg` },
+                    { name: 'Brazo', path: `${basePath}cuerpo_brazo.jpg` },
+                    { name: 'Pierna', path: `${basePath}cuerpo_pierna.jpg` }
                 ],
                 diasdesemana: [
-                    { name: 'lunes.jpg', path: `${basePath}lunes.jpg` },
-                    { name: 'martes.jpg', path: `${basePath}martes.jpg` },
-                    { name: 'miercoles.jpg', path: `${basePath}miercoles.jpg` },
-                    { name: 'jueves.jpg', path: `${basePath}jueves.jpg` },
-                    { name: 'viernes.jpg', path: `${basePath}viernes.jpg` },
-                    { name: 'sabado.jpg', path: `${basePath}sabado.jpg` },
-                    { name: 'domingo.jpg', path: `${basePath}domingo.jpg` }
+                    { name: 'Lunes', path: `${basePath}lunes.jpg` },
+                    { name: 'Martes', path: `${basePath}martes.jpg` },
+                    { name: 'Miércoles', path: `${basePath}miercoles.jpg` },
+                    { name: 'Jueves', path: `${basePath}jueves.jpg` },
+                    { name: 'Viernes', path: `${basePath}viernes.jpg` },
+                    { name: 'Sábado', path: `${basePath}sabado.jpg` },
+                    { name: 'Domingo', path: `${basePath}domingo.jpg` }
                 ],
                 escuela: [
-                    { name: 'Captura de pantalla 2025-04-10 125135.png', path: `${basePath}Captura de pantalla 2025-04-10 125135.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125140.png', path: `${basePath}Captura de pantalla 2025-04-10 125140.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125144.png', path: `${basePath}Captura de pantalla 2025-04-10 125144.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125149.png', path: `${basePath}Captura de pantalla 2025-04-10 125149.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125153.png', path: `${basePath}Captura de pantalla 2025-04-10 125153.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125157.png', path: `${basePath}Captura de pantalla 2025-04-10 125157.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125203.png', path: `${basePath}Captura de pantalla 2025-04-10 125203.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125208.png', path: `${basePath}Captura de pantalla 2025-04-10 125208.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125212.png', path: `${basePath}Captura de pantalla 2025-04-10 125212.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125217.png', path: `${basePath}Captura de pantalla 2025-04-10 125217.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125222.png', path: `${basePath}Captura de pantalla 2025-04-10 125222.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125228.png', path: `${basePath}Captura de pantalla 2025-04-10 125228.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125233.png', path: `${basePath}Captura de pantalla 2025-04-10 125233.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125238.png', path: `${basePath}Captura de pantalla 2025-04-10 125238.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125243.png', path: `${basePath}Captura de pantalla 2025-04-10 125243.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125248.png', path: `${basePath}Captura de pantalla 2025-04-10 125248.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125252.png', path: `${basePath}Captura de pantalla 2025-04-10 125252.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125258.png', path: `${basePath}Captura de pantalla 2025-04-10 125258.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125258.png', path: `${basePath}Captura de pantalla 2025-04-10 125258.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125301.png', path: `${basePath}Captura de pantalla 2025-04-10 125301.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125306.png', path: `${basePath}Captura de pantalla 2025-04-10 125306.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125311.png', path: `${basePath}Captura de pantalla 2025-04-10 125311.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125315.png', path: `${basePath}Captura de pantalla 2025-04-10 125315.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125319.png', path: `${basePath}Captura de pantalla 2025-04-10 125319.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125325.png', path: `${basePath}Captura de pantalla 2025-04-10 125325.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125329.png', path: `${basePath}Captura de pantalla 2025-04-10 125329.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125333.png', path: `${basePath}Captura de pantalla 2025-04-10 125333.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125341.png', path: `${basePath}Captura de pantalla 2025-04-10 125341.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125346.png', path: `${basePath}Captura de pantalla 2025-04-10 125346.png` },
-                    { name: 'Captura de pantalla 2025-04-10 125350.png', path: `${basePath}Captura de pantalla 2025-04-10 125350.png` },
+                    { name: 'Antropología', path: `${basePath}antropologia.jpg` },
+                    { name: 'Bandera', path: `${basePath}bandera.jpg` },
+                    { name: 'Calificación', path: `${basePath}calificacion.jpg` },
+                    { name: 'Campana', path: `${basePath}campana.jpg` },
+                    { name: 'Certificado', path: `${basePath}certificado.jpg` },
+                    { name: 'Compás', path: `${basePath}compas.jpg` },
+                    { name: 'Computación', path: `${basePath}computacion.jpg` },
+                    { name: 'Cuaderno', path: `${basePath}cuaderno.jpg` },
+                    { name: 'Dibujo', path: `${basePath}dibujo.jpg` },
+                    { name: 'Diccionario', path: `${basePath}diccionario.jpg` },
+                    { name: 'Escala', path: `${basePath}escala.jpg` },
+                    { name: 'Escuadra', path: `${basePath}escuadra.jpg` },
+                    { name: 'Escuela', path: `${basePath}escuela.jpg` },
+                    { name: 'Estudiante', path: `${basePath}estudiante.jpg` },
+                    { name: 'Goma', path: `${basePath}goma.jpg` },
+                    { name: 'Lápiz', path: `${basePath}lapiz.jpg` },
+                    { name: 'Lección', path: `${basePath}leccion.jpg` },
+                    { name: 'Mapa', path: `${basePath}mapa.jpg` },
+                    { name: 'Microscopio', path: `${basePath}microscopio.jpg` },
+                    { name: 'Papel', path: `${basePath}papel.jpg` },
+                    { name: 'Párrafo', path: `${basePath}parrafo.jpg` },
+                    { name: 'Perspectiva', path: `${basePath}perspectiva.jpg` },
+                    { name: 'Pizarrón', path: `${basePath}pizarron.jpg` },
+                    { name: 'Pluma', path: `${basePath}pluma.jpg` },
+                    { name: 'Politécnico', path: `${basePath}politecnico.jpg` },
+                    { name: 'Premio', path: `${basePath}premio.jpg` },
+                    { name: 'Preparatoria', path: `${basePath}preparatoria.jpg` },
+                    { name: 'Primaria', path: `${basePath}primaria.jpg` },
+                    { name: 'Prueba', path: `${basePath}prueba.jpg` },
+                    { name: 'Química', path: `${basePath}quimica.jpg` },
+                    { name: 'Sacapuntas', path: `${basePath}sacapuntas.jpg` },
+                    { name: 'Secundaria', path: `${basePath}secundaria.jpg` },
+                    { name: 'Tecnológico', path: `${basePath}tecnologico.jpg` }
                 ],
                 estaciones: [
-                    { name: 'Captura de pantalla 2025-04-10 121722.png', path: `${basePath}Captura de pantalla 2025-04-10 121722.png` },
-                    { name: 'Captura de pantalla 2025-04-10 121727.png', path: `${basePath}eCaptura de pantalla 2025-04-10 121727.png` },
-                    { name: 'Captura de pantalla 2025-04-10 121733.png', path: `${basePath}Captura de pantalla 2025-04-10 121733.png` },
-                    { name: 'Captura de pantalla 2025-04-10 121737.png', path: `${basePath}Captura de pantalla 2025-04-10 121737.png` }
-                    
+                    { name: 'Primavera', path: `${basePath}primavera.jpg` },
+                    { name: 'Verano', path: `${basePath}verano.jpg` },
+                    { name: 'Otoño', path: `${basePath}otoño.jpg` },
+                    { name: 'Invierno', path: `${basePath}invierno.jpg` }
                 ],
                 meses: [
-                    { name: 'mes_enero.png', path: `${basePath}mes_enero.png` },
-                    { name: 'mes_febrero.png', path: `${basePath}mes_febrero.png` },
-                    { name: 'mes_marzo.png', path: `${basePath}mes_marzo.png` },
-                    { name: 'mes_abril.png', path: `${basePath}mes_abril.png` },
-                    { name: 'mes_mayo.png', path: `${basePath}mes_mayo.png` },
-                    { name: 'mes_junio.png', path: `${basePath}mes_junio.png` },
-                    { name: 'mes_julio.png', path: `${basePath}mes_julio.png` },
-                    { name: 'mes_agosto.png', path: `${basePath}mes_agosto.png` },
-                    { name: 'mes_septiembre.png', path: `${basePath}mes_septiembre.png` },
-                    { name: 'mes_octubre.png', path: `${basePath}mes_octubre.png` },
-                    { name: 'mes_noviembre.png', path: `${basePath}mes_noviembre.png` },
-                    { name: 'mes_diciembre.png', path: `${basePath}mes_diciembre.` }
+                    { name: 'Enero', path: `${basePath}enero.jpg` },
+                    { name: 'Febrero', path: `${basePath}febrero.jpg` },
+                    { name: 'Marzo', path: `${basePath}marzo.jpg` },
+                    { name: 'Abril', path: `${basePath}abril.jpg` },
+                    { name: 'Mayo', path: `${basePath}mayo.jpg` },
+                    { name: 'Junio', path: `${basePath}junio.jpg` },
+                    { name: 'Julio', path: `${basePath}julio.jpg` },
+                    { name: 'Agosto', path: `${basePath}agosto.jpg` },
+                    { name: 'Septiembre', path: `${basePath}septiembre.jpg` },
+                    { name: 'Octubre', path: `${basePath}octubre.jpg` },
+                    { name: 'Noviembre', path: `${basePath}noviembre.jpg` },
+                    { name: 'Diciembre', path: `${basePath}diciembre.jpg` }
                 ],
                 tiempo: [
-                    { name: 'tiempo_sol.jpg', path: `${basePath}tiempo_sol.jpg` },
-                    { name: 'tiempo_lluvia.jpg', path: `${basePath}tiempo_lluvia.jpg` },
-                    { name: 'tiempo_nieve.jpg', path: `${basePath}tiempo_nieve.jpg` },
-                    { name: 'tiempo_viento.jpg', path: `${basePath}tiempo_viento.jpg` }
+                    { name: 'Sol', path: `${basePath}tiempo_sol.jpg` },
+                    { name: 'Lluvia', path: `${basePath}tiempo_lluvia.jpg` },
+                    { name: 'Nieve', path: `${basePath}tiempo_nieve.jpg` },
+                    { name: 'Viento', path: `${basePath}tiempo_viento.jpg` }
                 ],
                 saludos: [
-                    { name: 'saludo_hola.jpg', path: `${basePath}saludo_hola.jpg` },
-                    { name: 'saludo_adios.jpg', path: `${basePath}saludo_adios.jpg` },
-                    { name: 'saludo_gracias.jpg', path: `${basePath}saludo_gracias.jpg` },
-                    { name: 'saludo_por_favor.jpg', path: `${basePath}saludo_por_favor.jpg` }
+                    { name: 'Hola', path: `${basePath}saludo_hola.jpg` },
+                    { name: 'Adiós', path: `${basePath}saludo_adios.jpg` },
+                    { name: 'Cómo estás', path: `${basePath}saludo_como_estas.jpg` },
+                    { name: 'Comparte', path: `${basePath}saludo_comparte.jpg` },
+                    { name: 'Ayuda', path: `${basePath}saludo_ayuda.jpg` }
+                ],
+                groserias: [
+                    { name: 'Tonto', path: `${basePath}groseria_tonto.jpg` },
+                    { name: 'Güey', path: `${basePath}groseria_guey.jpg` },
+                    { name: 'Idiota', path: `${basePath}groseria_idiota.jpg` },
+                    { name: 'Puto', path: `${basePath}groseria_puto.jpg` },
+                    { name: 'Mierda', path: `${basePath}groseria_mierda.jpg` },
+                    { name: 'Zorra', path: `${basePath}groseria_zorra.jpg` },
+                    { name: 'Pendejo', path: `${basePath}groseria_pendejo.jpg` },
+                    { name: 'Verga', path: `${basePath}groseria_verga.jpg` }
                 ]
             };
             return images[folder] || [];
@@ -1091,195 +1177,11 @@ function showVideos(folder) {
             console.log('[DEBUG] Carousel moved: index=' + currentIndex);
         }
 
-        function startCamera() {
-            if (cameraInstance) {
-        console.log('[DEBUG] Camera already running');
-        return;
-    }
+        window.moveCarousel = moveCarousel;
 
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const status = document.getElementById('status');
-    const gesture = document.getElementById('gesture');
-    const errorMessage = document.getElementById('errorMessage');
-    const debugMessage = document.getElementById('debugMessage');
-    const videoContainer = document.getElementById('videoContainer');
+        renderMainScreen();
 
-    if (!video || !canvas || !status || !gesture || !errorMessage || !debugMessage || !videoContainer) {
-        console.error('[ERROR] Missing DOM elements for camera');
-        errorMessage.textContent = 'Error: Elementos de la interfaz no encontrados.';
-        errorMessage.classList.remove('hidden');
-        return;
-    }
-
-    currentVideo = video;
-    const canvasCtx = canvas.getContext('2d');
-
-    handsInstance = new Hands({
-        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1646424915/${file}`
-    });
-
-    handsInstance.setOptions({
-        maxNumHands: 2,
-        modelComplexity: 1,
-        minDetectionConfidence: 0.7,
-        minTrackingConfidence: 0.7
-    });
-
-
-
-
-
-
-    handsInstance.onResults(async (results) => {
-    const currentTime = performance.now();
-    if (currentTime - lastFrameTime < FRAME_INTERVAL) {
-        return;
-    }
-    lastFrameTime = currentTime;
-
-    const canvasCtx = canvas.getContext('2d');
-    canvasCtx.save();
-    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-    canvasCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    let detectedSign = null;
-    let debugInfo = [];
-
-    try {
-        if (results.multiHandLandmarks && results.multiHandedness) {
-            videoContainer.classList.add('hands-detected');
-            status.textContent = 'Manos detectadas';
-            status.classList.remove('blink');
-
-            for (let i = 0; i < results.multiHandLandmarks.length; i++) {
-                const landmarks = results.multiHandLandmarks[i];
-                const handedness = results.multiHandedness[i];
-                drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, { color: '#34d399', lineWidth: 5 });
-                drawLandmarks(canvasCtx, landmarks, { color: '#a855f7', lineWidth: 2 });
-
-                const sign = await detectLSMSign(video);
-                if (sign) {
-                    detectedSign = sign;
-                    debugInfo.push(`Mano ${i + 1} (${handedness.label}): ${sign}`);
-                } else {
-                    debugInfo.push(`Mano ${i + 1} (${handedness.label}): No detectada`);
-                }
-            }
-        } else {
-            videoContainer.classList.remove('hands-detected');
-            status.textContent = 'No se detectan manos';
-            status.classList.add('blink');
-            debugInfo.push('No se detectaron manos');
-        }
-    } catch (generalError) {
-        console.error('[ERROR] Error general en onResults:', generalError);
-    }
-
-    canvasCtx.restore();
-
-    if (detectedSign && detectedSign !== lastDetectedSign) {
-        gesture.textContent = `Seña detectada: ${detectedSign}`;
-        debugMessage.textContent = debugInfo.join('\n');
-        debugMessage.classList.remove('hidden');
-
-        if (selectedVoice && 'speechSynthesis' in window) {
-            const utterance = new SpeechSynthesisUtterance(detectedSign);
-            utterance.voice = selectedVoice;
-            utterance.lang = selectedVoice ? selectedVoice.lang : 'es-MX';
-            utterance.volume = 1;
-            utterance.rate = 1;
-            utterance.pitch = 1;
-            speechSynthesis.cancel();
-            speechSynthesis.speak(utterance);
-        }
-        lastDetectedSign = detectedSign;
-    } else if (!detectedSign) {
-        gesture.textContent = 'Seña detectada: Ninguna';
-        lastDetectedSign = null;
-    }
-
-    if (debugInfo.length > 0) {
-        console.log('[DEBUG] Frame processed:\n' + debugInfo.join('\n'));
-    }
-});
-
-
-
-
-
-
-    navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user', width: 640, height: 480 }
-    }).then(stream => {
-        video.srcObject = stream;
-        video.play().catch(err => {
-            console.error('[ERROR] Failed to play video:', err);
-            errorMessage.textContent = 'Error al reproducir el video. Verifica los permisos de la cámara.';
-            errorMessage.classList.remove('hidden');
-            status.textContent = 'Error en la cámara';
-            status.classList.add('blink');
-        });
-
-        video.onloadedmetadata = () => {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            cameraInstance = new Camera(video, {
-                onFrame: async () => {
-                    await handsInstance.send({ image: video });
-                },
-                width: video.videoWidth,
-                height: video.videoHeight
-            });
-            cameraInstance.start();
-            status.textContent = 'Cámara iniciada';
-            console.log('[DEBUG] Camera started with resolution ' + video.videoWidth + 'x' + video.videoHeight);
-        };
-    }).catch(err => {
-        console.error('[ERROR] Camera access denied:', err);
-        errorMessage.textContent = 'No se pudo acceder a la cámara. Por favor, permite el acceso.';
-        errorMessage.classList.remove('hidden');
-        status.textContent = 'Error: Cámara no disponible';
-        status.classList.add('blink');
-    });
-}
-
-
-
-
-
-function stopCamera() {
-    if (cameraInstance) {
-        cameraInstance.stop();
-        cameraInstance = null;
-        console.log('[DEBUG] Camera stopped');
-    }
-    if (currentVideo && currentVideo.srcObject) {
-        const stream = currentVideo.srcObject;
-        const tracks = stream.getTracks();
-        tracks.forEach(track => track.stop());
-        currentVideo.srcObject = null;
-        console.log('[DEBUG] Video stream stopped');
-    }
-    if (handsInstance) {
-        handsInstance.close();
-        handsInstance = null;
-        console.log('[DEBUG] Hands instance closed');
-    }
-    landmarkHistory = [];
-    smoothedLandmarks = [];
-    lastDetectedSign = null;
-    sePuedeDetectar = true;
-    ultimaSeña = null;
-}
-
-window.moveCarousel = moveCarousel;
-
-renderMainScreen();
-
-console.log('[DEBUG] Application initialized');
-</script>
+        console.log('[DEBUG] Application initialized');
+    </script>
 </body>
 </html>
-
-
